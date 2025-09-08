@@ -1,0 +1,15 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Plugins/DevPeixoto/UI/MenuManager/UGUI/XML/UIFlowStyle.uss?fileID=7433441132597879392&amp;guid=f6115f6af7e0def49b9e5ab71a79ca4f&amp;type=3#UIFlowStyle" />
+    <engine:VisualElement name="Container" style="flex-grow: 1; margin-top: 5px; margin-bottom: 5px;">
+        <engine:VisualElement name="Container" style="flex-grow: 1; flex-direction: row; width: 100%;">
+            <engine:Label text="Label" name="ButtonNameLabel" class="bigLabel" style="width: 30%;" />
+            <engine:VisualElement name="GroupGoTo" style="flex-grow: 1; width: 70%; flex-direction: row;">
+                <engine:Label text="opens" name="Label" class="bigLabel" style="width: 30%;" />
+                <editor:ObjectField label="Object Field" name="TargetMenu" data-source-type="UnityEditor.Menu, UnityEditor.CoreModule" style="width: 70%;" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="Container" style="flex-grow: 1;">
+            <engine:Toggle label="Is Back Button" name="IsBackButton" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

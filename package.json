@@ -1,0 +1,30 @@
+{
+  "name": "com.devpeixoto.menusmanagerugui",
+  "version": "1.0.0",
+  "displayName": "Menus Manager (UGUI)",
+  "description": "Tool to simplify the management of menu in game.",
+  "unity": "6000.0",
+  "documentationUrl": "https://github.com/FellipePeixoto/",
+  "changelogUrl": "https://github.com/FellipePeixoto/menusmanagerugui/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/FellipePeixoto/menusmanagerugui/blob/main/LICENSE",
+  "samples": [
+    {
+      "displayName": "Usage Example",
+      "description": "A simple example of how to setup the Menus Manager in your game scene",
+      "path": "Samples~/SimpleExample"
+    }
+  ],
+  "keywords": [
+    "devpeixoto",
+    "Fellipe Peixoto",
+    "UI",
+    "menu",
+    "menus",
+    "manager"
+  ],
+  "author": {
+    "name": "Fellipe Peixoto",
+    "email": "devpeixoto@gmail.com",
+    "url": "https://www.devpeixoto.com/gamedeveloper"
+  }
+}

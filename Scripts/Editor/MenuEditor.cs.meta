@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: deea6886ec7ef304fa4a87a9d3bcd013
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - baseXml: {fileID: 9197481963319205126, guid: e3105de3afc28cb4787a1527116bb909, type: 3}
+  - uiFlowXml: {fileID: 9197481963319205126, guid: 4a69928127be5a4459e9bc46cb858964, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
