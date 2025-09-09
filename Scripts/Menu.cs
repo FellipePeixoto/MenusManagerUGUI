@@ -11,15 +11,14 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 {
     [System.Serializable]
     [AddComponentMenu("DevPeixoto/UI/Menu Manager/Menu")]
-    [RequireComponent(typeof(CanvasGroup))]
+    [RequireComponent(typeof(CanvasGroup), typeof(Animator))]
     public class Menu : MonoBehaviour
     {
         [Header("Event System")]
         public GameObject firstSelected;
         [SerializeField] bool keepOnBackground = false;
         [SerializeField] bool scaledTime = false;
-        [SerializeField] string animatorVisibleBool = "visible";
-        [SerializeField] string animatorInitialState = "MenuHidden";
+        [SerializeField] AnimatorSettings animatorSettings = new AnimatorSettings();
         [SerializeField] MenuDisplayMethod menuDisplayMethod;
         [SerializeField] Fade fadeIn;
         [SerializeField] Fade fadeOut;
@@ -44,7 +43,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
         Animator animator;
-        Animator Animator
+        public Animator Animator
         {
             get
             {
@@ -284,6 +283,15 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         public Menu GoTo;
     }
 
+    [System.Serializable]
+    public class AnimatorSettings
+    {
+        [HideInInspector] public string DefaultState = "MenuHidden";
+        [HideInInspector] public string HiddenState = "MenuHidden";
+        [HideInInspector] public string VisibleState = "MenuVisible";
+        [HideInInspector] public string VisibleParam = "visible";
+    }
+
     public enum MenuDisplayMethod
     {
         [Description("Game Object State")]
@@ -292,5 +300,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         CanvasGroup = 1,
         [Description("Fade In and Out")]
         Fade = 2,
+        [Description("Contro with Animator")]
+        Animator = 3,
     }
 }

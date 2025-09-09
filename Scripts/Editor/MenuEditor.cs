@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -22,9 +23,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             SerializedProperty firstSelectedProp = serializedObject.FindProperty("firstSelected");
             topOptions.Add(new PropertyField(firstSelectedProp));
             SerializedProperty keepOnBackgroundProp = serializedObject.FindProperty("keepOnBackground");
-            topOptions.Add(new PropertyField(keepOnBackgroundProp));    
+            topOptions.Add(new PropertyField(keepOnBackgroundProp));
 
-            new XmlComponents(root, serializedObject);
+            new XmlComponents(root, (Menu)target, serializedObject);
 
             Foldout eventsFoldout = new Foldout();
             eventsFoldout.text = "Events";
@@ -52,7 +53,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 isBackButtonToggle.value = isBackButtonProp.boolValue;
                 var groupGoTo = visualElement.Q<VisualElement>("GroupGoTo");
                 groupGoTo.style.display = isBackButtonToggle.value ? DisplayStyle.None : DisplayStyle.Flex;
-                isBackButtonToggle.RegisterValueChangedCallback(evnt => {
+                isBackButtonToggle.RegisterValueChangedCallback(evnt =>
+                {
                     isBackButtonProp.boolValue = evnt.newValue;
                     serializedObject.ApplyModifiedProperties();
 
@@ -87,7 +89,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         public Box FadeSection;
         public Box AnimatorSection;
 
-        public XmlComponents(VisualElement root, SerializedObject serializedObject)
+        public XmlComponents(VisualElement root, Menu target, SerializedObject serializedObject)
         {
             FadeSection = new Box();
             FadeSection.Add(new Label("Fade Options"));
@@ -100,11 +102,10 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             root.Add(FadeSection);
 
             AnimatorSection = new Box();
-            AnimatorSection.Add(new Label("Animator Options"));
-            SerializedProperty animatorInitialStateProp = serializedObject.FindProperty("animatorInitialState");
-            AnimatorSection.Add(new PropertyField(animatorInitialStateProp));
-            SerializedProperty animatorShowProp = serializedObject.FindProperty("animatorVisibleBool");
-            AnimatorSection.Add(new PropertyField(animatorShowProp));
+            if (target.Animator.runtimeAnimatorController == null)
+            {
+                root.Add(new Button() { text = "Generate Animator Controller" });
+            }
             root.Add(AnimatorSection);
 
             var values = Enum.GetValues(typeof(MenuDisplayMethod)).Cast<MenuDisplayMethod>();
@@ -133,7 +134,37 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 case MenuDisplayMethod.Fade:
                     FadeSection.style.display = DisplayStyle.Flex;
                     break;
+
+                case MenuDisplayMethod.Animator:
+                    AnimatorSection.style.display = DisplayStyle.Flex;
+                    break;
             }
+        }
+
+        AnimatorController CreateAnimatorController(AnimatorSettings animatorSettings)
+        {
+            string animatorPath = EditorUtility.SaveFilePanelInProject(
+                "New animation controller",
+                "Menu Animator Controller",
+                "controller",
+                "Create a new animator controller"
+            );
+
+            if (string.IsNullOrEmpty(animatorPath))
+                return null;
+
+            AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(animatorPath);
+
+            controller.AddParameter(animatorSettings.VisibleParam, AnimatorControllerParameterType.Bool);
+
+            AnimatorState defaultState = new AnimatorState() { name = animatorSettings.HiddenState };
+            controller.layers[0].stateMachine.AddState(defaultState, Vector3.zero);
+            controller.layers[0].stateMachine.defaultState = defaultState;
+
+            AnimatorState visibleState = new AnimatorState() { name = animatorSettings.VisibleState };
+            controller.layers[0].stateMachine.AddState(animatorSettings.VisibleState, Vector3.right * 5);
+
+            return null;
         }
 
         string GetDescription(Enum value)
