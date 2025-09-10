@@ -74,6 +74,12 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     CanvasGroup.blocksRaycasts = false;
                     CanvasGroup.interactable = false;
                     break;
+
+                case MenuDisplayMethod.Animator:
+                    Animator.Play(animatorSettings.DefaultState);
+                    Animator.SetBool(animatorSettings.VisibleParam, false);
+                    HandleCanvasGroupOnAnimatorMode(false);
+                    break;
             }
 
             parentMenusManager = respectiveMenusManager;
@@ -103,6 +109,11 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
                 case MenuDisplayMethod.Fade:
                     StartCoroutine(CanvasGroupFadeIn());
+                    break;
+
+                case MenuDisplayMethod.Animator:
+                    Animator.SetBool(animatorSettings.VisibleParam, true);
+                    HandleCanvasGroupOnAnimatorMode(true);
                     break;
             }
 
@@ -136,6 +147,11 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 case MenuDisplayMethod.Fade:
                     if (!keepOnBackground)
                         StartCoroutine(CanvasGroupFadeOut());
+                    break;
+
+                case MenuDisplayMethod.Animator:
+                    Animator.SetBool(animatorSettings.VisibleParam, false);
+                    HandleCanvasGroupOnAnimatorMode(false);
                     break;
             }
 
@@ -235,6 +251,12 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     });
                 }
             }
+        }
+
+        void HandleCanvasGroupOnAnimatorMode(bool visible)
+        {
+            CanvasGroup.blocksRaycasts = visible;
+            CanvasGroup.interactable = visible;
         }
 
 #if UNITY_EDITOR

@@ -6,22 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Animator Display Method
+- Merge Canvas Group Method with Fade method
 
 ### Added
-- Nothing yet
+- Animator Display Method
 
 ### Changed
-- Nothing yet
+- Inspector UI of Menu
 
 ### Deprecated
 - Nothing yet
 
 ### Removed
-- Nothing yet
+- Some meta files
 
 ### Fixed
 - Nothing yet
+
+## [1.1.0] - 2025-09-09
+
+### Added
+
+- Animator Display Method
+
+### Changed
+
+- Inspector UI of Menu
 
 ## [1.0.0] - 2025-09-08
 
@@ -36,17 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stackable menus**: Each menu that opens is remembered. Forward navigation goes deeper, back navigation retraces the exact route.
 - **Keep menu on background**: Open a menu in front of another and keep the old one visible in the background.
 - **Automatically Get the Menus**: Get the menus automatically in children or set by yourself.
-
----
-
-## Release Notes
-
-### Version 1.0.0
-This is the initial stable release of the Menus Manager Tool package. The component provides a helper to manage menus in Unity.
-
-**Key Highlights:**
-- Custom transition methods
-- Button navigation assignment requires no additional code
 
 ---
 

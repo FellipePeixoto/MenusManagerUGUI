@@ -27,3 +27,4 @@ Manageable component that represents an individual menu in the system.
 - `State`: Set the Game Object Enabled or Disabled
 - `CanvasGroup`: Controls the interaction and Alpha of the Canvas Group attached
 - `Fade`: Fade in or out the Menu
+- `Control With Animator`: Make your custom animations for Visible and Hidden states of the menus.

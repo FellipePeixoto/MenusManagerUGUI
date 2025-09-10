@@ -20,8 +20,11 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             root = Resources.Load<VisualTreeAsset>("XML/MenuEditor").CloneTree();
 
             VisualElement topOptions = root.Q<VisualElement>("TopOptions");
+            
             SerializedProperty firstSelectedProp = serializedObject.FindProperty("firstSelected");
             topOptions.Add(new PropertyField(firstSelectedProp));
+
+            SerializedProperty menuDisplayMethodProp = serializedObject.FindProperty("menuDisplayMethod");
             SerializedProperty keepOnBackgroundProp = serializedObject.FindProperty("keepOnBackground");
             topOptions.Add(new PropertyField(keepOnBackgroundProp));
 
@@ -102,9 +105,17 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             root.Add(FadeSection);
 
             AnimatorSection = new Box();
+            SerializedProperty animatorSettingsProp = serializedObject.FindProperty("animatorSettings");
+            AnimatorSettings animatorSettings = new AnimatorSettings()
+            {
+                DefaultState = animatorSettingsProp.FindPropertyRelative("DefaultState").stringValue,
+                HiddenState = animatorSettingsProp.FindPropertyRelative("HiddenState").stringValue,
+                VisibleState = animatorSettingsProp.FindPropertyRelative("VisibleState").stringValue,
+                VisibleParam = animatorSettingsProp.FindPropertyRelative("VisibleParam").stringValue
+            };
             if (target.Animator.runtimeAnimatorController == null)
             {
-                root.Add(new Button() { text = "Generate Animator Controller" });
+                AnimatorSection.Add(new Button(() => HandleGenerateAnimatorButtonClick(target.Animator, animatorSettings)) { text = "Generate Animator Controller" });
             }
             root.Add(AnimatorSection);
 
@@ -141,11 +152,16 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             }
         }
 
+        void HandleGenerateAnimatorButtonClick(Animator animator, AnimatorSettings animatorSettings)
+        {
+            animator.runtimeAnimatorController = CreateAnimatorController(animatorSettings);
+        }
+
         AnimatorController CreateAnimatorController(AnimatorSettings animatorSettings)
         {
             string animatorPath = EditorUtility.SaveFilePanelInProject(
                 "New animation controller",
-                "Menu Animator Controller",
+                "MenuAnimatorController",
                 "controller",
                 "Create a new animator controller"
             );
@@ -157,14 +173,32 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             controller.AddParameter(animatorSettings.VisibleParam, AnimatorControllerParameterType.Bool);
 
-            AnimatorState defaultState = new AnimatorState() { name = animatorSettings.HiddenState };
-            controller.layers[0].stateMachine.AddState(defaultState, Vector3.zero);
-            controller.layers[0].stateMachine.defaultState = defaultState;
+            AnimationClip defaultClip = new AnimationClip() { name = animatorSettings.HiddenState, wrapMode = WrapMode.Once, hideFlags = HideFlags.None };
+            AssetDatabase.AddObjectToAsset(defaultClip, controller);
+            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(defaultClip));
+            AnimatorState defaultStateHidden = controller.AddMotion(defaultClip);
+            controller.layers[0].stateMachine.AddState(defaultStateHidden, Vector3.one);
+            controller.layers[0].stateMachine.defaultState = defaultStateHidden;
 
-            AnimatorState visibleState = new AnimatorState() { name = animatorSettings.VisibleState };
-            controller.layers[0].stateMachine.AddState(animatorSettings.VisibleState, Vector3.right * 5);
+            AnimationClip visibleClip = new AnimationClip() { name = animatorSettings.VisibleState, wrapMode = WrapMode.Once, hideFlags = HideFlags.None };
+            AssetDatabase.AddObjectToAsset(visibleClip, controller);
+            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(visibleClip));
+            AnimatorState visibleState = controller.AddMotion(visibleClip);
+            controller.layers[0].stateMachine.AddState(visibleState, Vector3.one + Vector3.right * 20);
 
-            return null;
+            AnimatorStateTransition hiddenToVisible = defaultStateHidden.AddTransition(visibleState);
+            hiddenToVisible.hasExitTime = false;
+            hiddenToVisible.exitTime = 0;
+            hiddenToVisible.duration = 0.1f;
+            hiddenToVisible.AddCondition(AnimatorConditionMode.If, 1, animatorSettings.VisibleParam);
+
+            AnimatorStateTransition visibleToExit = visibleState.AddExitTransition();
+            visibleToExit.hasExitTime = false;
+            visibleToExit.exitTime = 0;
+            visibleToExit.duration = 0.1f;
+            visibleToExit.AddCondition(AnimatorConditionMode.IfNot, 1, animatorSettings.VisibleParam);
+
+            return controller;
         }
 
         string GetDescription(Enum value)
