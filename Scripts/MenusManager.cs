@@ -32,21 +32,29 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 menus = GetComponentsInChildren<Menu>(true).ToList();
             }
 
-            foreach (var menu in menus)
-            {
-                menu.gameObject.SetActive(true);
-                menu.Init(this);
-            }
-
             if (defaultMenu != null)
             {
                 defaultMenu.Show(true, transform);
                 currentMenuList.Add(defaultMenu);
             }
             else if (firstSiblingIsTheDefault && menus.Count > 0)
+            { 
+                defaultMenu = menus[0];
+                currentMenuList.Add(defaultMenu);
+                defaultMenu.Show(true, transform);
+            }
+
+            foreach (var menu in menus)
             {
-                currentMenuList.Add(menus[0]);
-                menus[0].Show(true, transform);
+                menu.gameObject.SetActive(true);
+                if (menu == defaultMenu)
+                {
+                    menu.Init(this, true);
+                }
+                else
+                {
+                    menu.Init(this, false);
+                }
             }
         }
 

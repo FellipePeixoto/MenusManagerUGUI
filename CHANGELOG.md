@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merge Canvas Group Method with Fade method
 
 ### Added
-- Animator Display Method
+- Bool to setup behaviour of animator method on Init
 
 ### Changed
-- Inspector UI of Menu
+- Init function signature of Menu classes
 
 ### Deprecated
 - Nothing yet
@@ -23,6 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Nothing yet
 
+## [1.2.0] - 2025-09-10
+
+### Added
+- Bool to setup behaviour of animator method on Init
+
+### Changed
+- Init function signature of Menu classes
+
+### Fixed
+- All menus playing Hidden animation on Init
+
 ## [1.1.0] - 2025-09-09
 
 ### Added
@@ -32,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Inspector UI of Menu
+
+### Removed
+- Some meta files
 
 ## [1.0.0] - 2025-09-08
 

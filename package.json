@@ -1,6 +1,6 @@
 {
   "name": "com.devpeixoto.menusmanagerugui",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "displayName": "Menus Manager (UGUI)",
   "description": "Tool to simplify the management of menu in game.",
   "unity": "6000.0",

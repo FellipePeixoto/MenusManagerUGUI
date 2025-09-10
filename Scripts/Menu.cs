@@ -58,27 +58,30 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         int sibblingIndex;
 
-        public void Init(MenusManager respectiveMenusManager)
+        public void Init(MenusManager respectiveMenusManager, bool visible)
         {
             sibblingIndex = transform.GetSiblingIndex();
 
             switch (menuDisplayMethod)
             {
                 case MenuDisplayMethod.State:
-                    gameObject.SetActive(false);
+                    gameObject.SetActive(visible);
                     break;
 
                 case MenuDisplayMethod.CanvasGroup:
                 case MenuDisplayMethod.Fade:
-                    CanvasGroup.alpha = 0;
-                    CanvasGroup.blocksRaycasts = false;
-                    CanvasGroup.interactable = false;
+                    CanvasGroup.alpha = visible ? 1 : 0;
+                    CanvasGroup.blocksRaycasts = visible;
+                    CanvasGroup.interactable = visible;
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.Play(animatorSettings.DefaultState);
-                    Animator.SetBool(animatorSettings.VisibleParam, false);
-                    HandleCanvasGroupOnAnimatorMode(false);
+                    Animator.Play(
+                        visible ? animatorSettings.VisibleState : animatorSettings.DefaultState, 
+                        0,
+                        animatorSettings.ExecuteAnimationOnInit ? 0 : 1);
+                    Animator.SetBool(animatorSettings.VisibleParam, visible);
+                    HandleCanvasGroupOnAnimatorMode(visible);
                     break;
             }
 
@@ -308,6 +311,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     [System.Serializable]
     public class AnimatorSettings
     {
+        public bool ExecuteAnimationOnInit;
         [HideInInspector] public string DefaultState = "MenuHidden";
         [HideInInspector] public string HiddenState = "MenuHidden";
         [HideInInspector] public string VisibleState = "MenuVisible";

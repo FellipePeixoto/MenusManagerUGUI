@@ -108,11 +108,13 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             SerializedProperty animatorSettingsProp = serializedObject.FindProperty("animatorSettings");
             AnimatorSettings animatorSettings = new AnimatorSettings()
             {
+                ExecuteAnimationOnInit = animatorSettingsProp.FindPropertyRelative("ExecuteAnimationOnInit").boolValue,
                 DefaultState = animatorSettingsProp.FindPropertyRelative("DefaultState").stringValue,
                 HiddenState = animatorSettingsProp.FindPropertyRelative("HiddenState").stringValue,
                 VisibleState = animatorSettingsProp.FindPropertyRelative("VisibleState").stringValue,
                 VisibleParam = animatorSettingsProp.FindPropertyRelative("VisibleParam").stringValue
             };
+            AnimatorSection.Add(new PropertyField(animatorSettingsProp.FindPropertyRelative("ExecuteAnimationOnInit"), "Play animation on Init"));
             if (target.Animator.runtimeAnimatorController == null)
             {
                 AnimatorSection.Add(new Button(() => HandleGenerateAnimatorButtonClick(target.Animator, animatorSettings)) { text = "Generate Animator Controller" });
