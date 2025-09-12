@@ -1,5 +1,5 @@
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEditor.Search;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -63,3 +63,4 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -223,3 +224,4 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
     }
 }
+#endif

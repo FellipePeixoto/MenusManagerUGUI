@@ -267,6 +267,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         {
             SetFlows();
         }
+#endif
 
         void SetFlows()
         {
@@ -289,7 +290,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 });
             }
         }
-#endif
     }
 
     [System.Serializable]
