@@ -9,19 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merge Canvas Group Method with Fade method
 
 ### Added
-- Bool to setup behaviour of animator method on Init
+- Nothing
 
 ### Changed
-- Init function signature of Menu classes
+- Nothing
 
 ### Deprecated
-- Nothing yet
+- Nothing
 
 ### Removed
-- Some meta files
+- Nothing
 
 ### Fixed
-- Nothing yet
+- Missing platform dependent compilation
+
+## [1.2.1] - 2025-09-10
+
+### Fixed
+- Missing platform dependent compilation
 
 ## [1.2.0] - 2025-09-10
 
