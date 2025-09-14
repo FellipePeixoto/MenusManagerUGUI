@@ -35,14 +35,17 @@ Just add this repository as a package in your project
 
 - Tested on Unity 6000.0.38.
 
-## Version History
+## Future Roadmap
 
-### [1.0.0] - 2025-09-08
-- Initial stable release
-- All core menu management features implemented
-- Complete inspector integration
-- Stackable menu system
-- Multiple transition options
+- [x] Include OnBeforeShow, OnShow, OnBeforeHide, OnHide
+- [ ] Add labels to better explain what each inspector option does
+- [ ] UNDO and Redo functionality
+- [ ] Better Editor Class structure
+- [ ] Add a dropdown to list the menus available from the current menu
+- [ ] Option to keep the last selected object in memory to select it by default when returning to the screen
+- [ ] Add missing parts in the API reference
+- [ ] Support for Multiple Selection
+
 
 ## Contributing
 

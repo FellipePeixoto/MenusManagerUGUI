@@ -34,10 +34,14 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             Foldout eventsFoldout = new Foldout();
             eventsFoldout.text = "Events";
             SerializedProperty onInitProp = serializedObject.FindProperty("onInit");
+            SerializedProperty onBeforeShowProp = serializedObject.FindProperty("onBeforeShow");
             SerializedProperty onShowProp = serializedObject.FindProperty("onShow");
+            SerializedProperty onBeforeHideProp = serializedObject.FindProperty("onBeforeHide");
             SerializedProperty onHideProp = serializedObject.FindProperty("onHide");
             eventsFoldout.Add(new PropertyField(onInitProp));
+            eventsFoldout.Add(new PropertyField(onBeforeShowProp));
             eventsFoldout.Add(new PropertyField(onShowProp));
+            eventsFoldout.Add(new PropertyField(onBeforeHideProp));
             eventsFoldout.Add(new PropertyField(onHideProp));
             root.Add(eventsFoldout);
 

@@ -25,7 +25,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         [SerializeField] List<UiFlow> uiFlows = new List<UiFlow>();
         public MenusManager parentMenusManager;
         public UnityEvent onInit;
+        public UnityEvent onBeforeShow;
         public UnityEvent onShow;
+        public UnityEvent onBeforeHide;
         public UnityEvent onHide;
 
         CanvasGroup canvasGroup;
@@ -92,6 +94,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         public void Show(bool notify = true, Transform parent = null)
         {
+            if (notify)
+                onBeforeShow?.Invoke();
+
             if (keepOnBackground)
             {
                 transform.SetParent(parent);
@@ -134,6 +139,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         public void Hide(bool notify = true, Transform parent = null)
         {
+            if (notify)
+                onBeforeHide?.Invoke();
+
             if (keepOnBackground)
                 transform.SetParent(parent);
 
