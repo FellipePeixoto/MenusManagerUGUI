@@ -112,7 +112,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 case MenuDisplayMethod.CanvasGroup:
                     if (fadeIn.Duration > 0)
                     {
-                        Debug.Log("STOP CanvasGroupFade");
                         if (fadeCoroutine != null)
                             StopCoroutine(fadeCoroutine);
                         fadeCoroutine = StartCoroutine(CanvasGroupFade(fadeIn));
@@ -182,7 +181,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         IEnumerator CanvasGroupFade(Fade fade, bool fadeIn = true)
         {
-            Debug.Log($"STARTED A {(fadeIn ? "Fade In" : "Fade Out")}");
             if (!fadeIn)
             {
                 CanvasGroup.interactable = true;
