@@ -57,6 +57,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
         int sibblingIndex;
+        Coroutine fadeCoroutine;
 
         public void Init(MenusManager respectiveMenusManager, bool visible)
         {
@@ -69,7 +70,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.CanvasGroup:
-                case MenuDisplayMethod.Fade:
                     CanvasGroup.alpha = visible ? 1 : 0;
                     CanvasGroup.blocksRaycasts = visible;
                     CanvasGroup.interactable = visible;
@@ -105,13 +105,19 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.CanvasGroup:
-                    CanvasGroup.alpha = 1;
-                    CanvasGroup.interactable = true;
-                    CanvasGroup.blocksRaycasts = true;
-                    break;
-
-                case MenuDisplayMethod.Fade:
-                    StartCoroutine(CanvasGroupFadeIn());
+                    if (fadeIn.Duration > 0)
+                    {
+                        Debug.Log("STOP CanvasGroupFade");
+                        if (fadeCoroutine != null)
+                            StopCoroutine(fadeCoroutine);
+                        fadeCoroutine = StartCoroutine(CanvasGroupFade(fadeIn));
+                    }
+                    else
+                    {
+                        CanvasGroup.alpha = 1;
+                        CanvasGroup.interactable = true;
+                        CanvasGroup.blocksRaycasts = true;
+                    }
                     break;
 
                 case MenuDisplayMethod.Animator:
@@ -141,15 +147,19 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 case MenuDisplayMethod.CanvasGroup:
                     if (!keepOnBackground)
                     {
-                        CanvasGroup.alpha = 0;
+                        if (fadeOut.Duration > 0)
+                        {
+                            if (fadeCoroutine != null)
+                                StopCoroutine(fadeCoroutine);
+                            fadeCoroutine = StartCoroutine(CanvasGroupFade(fadeOut, false));
+                        }
+                        else
+                        {
+                            CanvasGroup.alpha = 0;
+                        }
                     }
                     CanvasGroup.interactable = false;
                     CanvasGroup.blocksRaycasts = false;
-                    break;
-
-                case MenuDisplayMethod.Fade:
-                    if (!keepOnBackground)
-                        StartCoroutine(CanvasGroupFadeOut());
                     break;
 
                 case MenuDisplayMethod.Animator:
@@ -162,72 +172,50 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 onHide?.Invoke();
         }
 
-        IEnumerator CanvasGroupFadeIn()
+        IEnumerator CanvasGroupFade(Fade fade, bool fadeIn = true)
         {
+            Debug.Log($"STARTED A {(fadeIn ? "Fade In" : "Fade Out")}");
+            if (!fadeIn)
+            {
+                CanvasGroup.interactable = true;
+                CanvasGroup.blocksRaycasts = true;
+            }
+
             if (scaledTime)
-                yield return new WaitForSeconds(fadeIn.Delay);
+                yield return new WaitForSeconds(fade.Delay);
             else
-                yield return new WaitForSecondsRealtime(fadeIn.Delay);
+                yield return new WaitForSecondsRealtime(fade.Delay);
 
             float timer = 0;
-            CanvasGroup.alpha = 0;
+            float evaluator = fadeIn ? 0 : 1;
 
             if (scaledTime)
             {
-                while (timer < fadeIn.Duration)
+                while (timer < fade.Duration)
                 {
                     timer += Time.deltaTime;
-                    CanvasGroup.alpha = fadeIn.Curve.Evaluate(timer / fadeIn.Duration);
+                    CanvasGroup.alpha = fade.Curve.Evaluate(Mathf.Abs((timer / fade.Duration) - evaluator));
                     yield return null;
                 }
             }
             else
             {
-                while (timer < fadeIn.Duration)
+                while (timer < fade.Duration)
                 {
                     timer += Time.unscaledDeltaTime;
-                    CanvasGroup.alpha = fadeIn.Curve.Evaluate(timer / fadeIn.Duration);
+                    CanvasGroup.alpha = fade.Curve.Evaluate(Mathf.Abs((timer / fade.Duration) - evaluator));
                     yield return null;
                 }
             }
 
-            CanvasGroup.alpha = 1;
-            CanvasGroup.interactable = true;
-            CanvasGroup.blocksRaycasts = true;
-        }
-
-        IEnumerator CanvasGroupFadeOut()
-        {
-            if (scaledTime)
-                yield return new WaitForSeconds(fadeOut.Delay);
-            else
-                yield return new WaitForSecondsRealtime(fadeOut.Delay);
-
-            float timer = fadeOut.Duration;
-            CanvasGroup.alpha = 1;
-
-            if (scaledTime)
+            if (fadeIn)
             {
-                while (timer > 0)
-                {
-                    timer -= Time.deltaTime;
-                    CanvasGroup.alpha = fadeOut.Curve.Evaluate(timer / fadeOut.Duration);
-                    yield return null;
-                }
-            }
-            else
-            {
-                while (timer > 0)
-                {
-                    timer -= Time.unscaledDeltaTime;
-                    CanvasGroup.alpha = fadeOut.Curve.Evaluate(timer / fadeOut.Duration);
-                    yield return null;
-                }
+                CanvasGroup.alpha = 1;
+                CanvasGroup.interactable = true;
+                CanvasGroup.blocksRaycasts = true;
             }
 
-            CanvasGroup.alpha = 0;
-            CanvasGroup.interactable = false;
-            CanvasGroup.blocksRaycasts = false;
+            fadeCoroutine = null;
         }
 
         public void LoadUiFlow()
@@ -296,7 +284,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     public class Fade
     {
         public float Delay;
-        public float Duration = 0.35f;
+        public float Duration = 0f;
         public AnimationCurve Curve = AnimationCurve.Linear(0, 0, 1, 1);
     }
 
@@ -324,8 +312,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         State = 0,
         [Description("Control with Canvas Group")]
         CanvasGroup = 1,
-        [Description("Fade In and Out")]
-        Fade = 2,
         [Description("Contro with Animator")]
         Animator = 3,
     }

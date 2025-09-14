@@ -145,7 +145,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             switch (displayMethod)
             {
-                case MenuDisplayMethod.Fade:
+                case MenuDisplayMethod.CanvasGroup:
                     FadeSection.style.display = DisplayStyle.Flex;
                     break;
 
