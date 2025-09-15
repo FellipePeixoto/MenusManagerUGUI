@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,6 +14,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         [SerializeField] bool nonRepeatedNav;
         [SerializeField] bool getMenusInChildren;
         [SerializeField] List<Menu> menus = new();
+        [SerializeField, HideInInspector] internal List<string> menusNames = new ();
 
         List<Menu> currentMenuList = new ();
         Transform backgroundMenusParent;
@@ -46,14 +48,18 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             foreach (var menu in menus)
             {
+                if (menu == null)
+                    continue;
+
+                menu.parentMenusManager = this;
                 menu.gameObject.SetActive(true);
                 if (menu == defaultMenu)
                 {
-                    menu.Init(this, true);
+                    menu.Init(true);
                 }
                 else
                 {
-                    menu.Init(this, false);
+                    menu.Init(false);
                 }
             }
         }
@@ -86,6 +92,11 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             menu.Show(true, transform);
             currentMenuList.Add(menu);
+        }
+
+        public void SwitchTo(string menuName)
+        {
+            SwitchTo(menus.Find(x => x.name == menuName));
         }
 
         /// <summary>
@@ -125,5 +136,42 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             currentMenuList.Add(menu);
             menu.Show(true, transform);
         }
+
+#if UNITY_EDITOR
+        private void OnHierarchyChanged()
+        {
+            foreach (var menu in menus)
+            {
+                if (menu != null && !menusNames.Contains(menu.name))
+                {
+                    menusNames.Add(menu.name);
+                }
+            }
+
+            var currentMenusNames = menus.Where(menu => menu != null).Select(x => x.name).ToList();
+            menusNames.RemoveAll(x => !currentMenusNames.Contains(x));
+            menusNames.Sort();
+        }
+
+        [InitializeOnLoadMethod]
+        static void OnUnityReload()
+        {
+            var allMenus = FindObjectsByType<MenusManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var item in allMenus)
+                EditorApplication.hierarchyChanged += item.OnHierarchyChanged;
+        }
+
+        private void OnValidate()
+        {
+            OnHierarchyChanged();
+            foreach (var menu in menus)
+            {
+                if (menu != null)
+                {
+                    menu.parentMenusManager = this;
+                }
+            }
+        }
+#endif
     }
 }

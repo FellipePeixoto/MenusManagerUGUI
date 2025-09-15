@@ -1,5 +1,7 @@
 #if UNITY_EDITOR
+using Codice.Client.BaseCommands;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
@@ -21,7 +23,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             root = Resources.Load<VisualTreeAsset>("XML/MenuEditor").CloneTree();
 
             VisualElement topOptions = root.Q<VisualElement>("TopOptions");
-            
+
             SerializedProperty firstSelectedProp = serializedObject.FindProperty("firstSelected");
             topOptions.Add(new PropertyField(firstSelectedProp));
 
@@ -45,49 +47,74 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             eventsFoldout.Add(new PropertyField(onHideProp));
             root.Add(eventsFoldout);
 
-            ((Menu)target).LoadUiFlow();
             SerializedProperty uiFlowsProp = serializedObject.FindProperty("uiFlows");
-            for (int i = 0; i < uiFlowsProp.arraySize; i++)
+            var parent = serializedObject.FindProperty("parentMenusManager").objectReferenceValue;
+            var options = MenuOptionsSingleton.Instance.GetOptions(parent as MenusManager);
+            var navigationList = new ListView()
             {
-                SerializedProperty uiFlowProp = uiFlowsProp.GetArrayElementAtIndex(i);
-                var visualElement = Resources.Load<VisualTreeAsset>("XML/UIFlow").CloneTree();
-
-                var buttonNameLabel = visualElement.Q<Label>("ButtonNameLabel");
-                SerializedProperty buttonProp = uiFlowProp.FindPropertyRelative("Button");
-                buttonNameLabel.text = buttonProp.objectReferenceValue.name;
-
-                var isBackButtonToggle = visualElement.Q<Toggle>("IsBackButton");
-                SerializedProperty isBackButtonProp = uiFlowProp.FindPropertyRelative("IsBackButton");
-                isBackButtonToggle.value = isBackButtonProp.boolValue;
-                var groupGoTo = visualElement.Q<VisualElement>("GroupGoTo");
-                groupGoTo.style.display = isBackButtonToggle.value ? DisplayStyle.None : DisplayStyle.Flex;
-                isBackButtonToggle.RegisterValueChangedCallback(evnt =>
-                {
-                    isBackButtonProp.boolValue = evnt.newValue;
-                    serializedObject.ApplyModifiedProperties();
-
-                    if (evnt.newValue)
-                    {
-                        groupGoTo.style.display = DisplayStyle.None;
-                    }
-                    else
-                    {
-                        groupGoTo.style.display = DisplayStyle.Flex;
-                    }
-                });
-
-                var objectField = visualElement.Q<ObjectField>("TargetMenu");
-                SerializedProperty objectFieldProp = uiFlowProp.FindPropertyRelative("GoTo");
-                objectField.labelElement.style.display = DisplayStyle.None;
-                objectField.objectType = typeof(Menu);
-                objectField.value = objectFieldProp.objectReferenceValue;
-                objectField.BindProperty(objectFieldProp);
-
-                root.Add(visualElement);
-            }
+                headerTitle = "Buttons In Menu",
+                showBoundCollectionSize = false,
+                showFoldoutHeader = true,
+                showAlternatingRowBackgrounds = AlternatingRowBackground.All,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                makeItem = () => new UIFlowTemplate(),
+                bindItem = (e, i) => (e as UIFlowTemplate).Bind(uiFlowsProp.GetArrayElementAtIndex(i), options)
+            };
+            navigationList.BindProperty(uiFlowsProp);
+            root.Add(navigationList);
 
             serializedObject.ApplyModifiedProperties();
             return root;
+        }
+
+        class UIFlowTemplate : VisualElement
+        {
+            public static readonly string k_label = "UIFlowLabel";
+            public static readonly string k_toggle = "UIFlowToggle";
+            public static readonly string k_dropdown = "UIFlowDropdown";
+
+            Label label;
+            Toggle toggle;
+            DropdownField dropdown;
+
+            public UIFlowTemplate()
+            {
+                label = new Label() { name = k_label };
+                Add(label);
+
+                toggle = new Toggle("Back to previous menu") { name = k_toggle };
+                Add(toggle);
+
+                dropdown = new DropdownField("Go To menu: ") { name = k_dropdown };
+                Add(dropdown);
+            }
+
+            public void Bind(SerializedProperty prop, List<string> options)
+            {
+                label.text = prop.FindPropertyRelative("Button").objectReferenceValue.name;
+
+                toggle.BindProperty(prop.FindPropertyRelative("IsBackButton"));
+                toggle.RegisterValueChangedCallback(e => dropdown.style.display = e.newValue ? DisplayStyle.None : DisplayStyle.Flex);
+
+                var dropdownField = this.Q<DropdownField>(k_dropdown);
+                var targetMenuProp = prop.FindPropertyRelative("targetMenuName");
+                dropdown.value = targetMenuProp.stringValue;
+                dropdown.BindProperty(targetMenuProp);
+                dropdown.choices = options;
+            }
+        }
+
+        List<string> SerializedStringList(SerializedProperty property)
+        {
+            var list = new List<string>();
+
+            for (int i = 0; i < property.arraySize; i++)
+            {
+                var item = property.GetArrayElementAtIndex(i);
+                list.Add(item.stringValue);
+            }
+
+            return list;
         }
     }
 
@@ -227,5 +254,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             Component = root.Q<T>(id);
         }
     }
+
+
 }
 #endif

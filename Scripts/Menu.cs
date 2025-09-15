@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -9,7 +10,6 @@ using UnityEngine.UI;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
-    [System.Serializable]
     [AddComponentMenu("DevPeixoto/UI/Menu Manager/Menu")]
     [RequireComponent(typeof(CanvasGroup), typeof(Animator))]
     public class Menu : MonoBehaviour
@@ -23,7 +23,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         [SerializeField] Fade fadeIn;
         [SerializeField] Fade fadeOut;
         [SerializeField] List<UiFlow> uiFlows = new List<UiFlow>();
-        public MenusManager parentMenusManager;
+        [SerializeReference, HideInInspector] internal MenusManager parentMenusManager;
         public UnityEvent onInit;
         public UnityEvent onBeforeShow;
         public UnityEvent onShow;
@@ -61,7 +61,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         int sibblingIndex;
         Coroutine fadeCoroutine;
 
-        public void Init(MenusManager respectiveMenusManager, bool visible)
+        public void Init(bool visible)
         {
             sibblingIndex = transform.GetSiblingIndex();
 
@@ -79,7 +79,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
                 case MenuDisplayMethod.Animator:
                     Animator.Play(
-                        visible ? animatorSettings.VisibleState : animatorSettings.DefaultState, 
+                        visible ? animatorSettings.VisibleState : animatorSettings.DefaultState,
                         0,
                         animatorSettings.ExecuteAnimationOnInit ? 0 : 1);
                     Animator.SetBool(animatorSettings.VisibleParam, visible);
@@ -87,7 +87,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
             }
 
-            parentMenusManager = respectiveMenusManager;
             SetFlows();
             onInit?.Invoke();
         }
@@ -224,50 +223,16 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             fadeCoroutine = null;
         }
 
-        public void LoadUiFlow()
-        {
-            var allButtons = GetComponentsInChildren<Button>();
-
-            if (uiFlows == null)
-            {
-                uiFlows = new();
-                foreach (var button in allButtons)
-                {
-                    uiFlows.Add(new UiFlow() { Button = button, GoTo = null });
-                }
-            }
-            else
-            {
-                var nonSetButtons = allButtons.Where(x => !uiFlows.Select(y => y.Button).Contains(x)).ToList();
-                foreach (var button in nonSetButtons)
-                {
-                    uiFlows.Add(new UiFlow()
-                    {
-                        Button = button,
-                        GoTo = null
-                    });
-                }
-            }
-        }
-
         void HandleCanvasGroupOnAnimatorMode(bool visible)
         {
             CanvasGroup.blocksRaycasts = visible;
             CanvasGroup.interactable = visible;
         }
 
-#if UNITY_EDITOR
-        private void OnValidate()
-        {
-            SetFlows();
-        }
-#endif
-
         void SetFlows()
         {
             foreach (var uiflow in uiFlows)
             {
-
                 uiflow.Button.onClick.RemoveAllListeners();
                 uiflow.Button.onClick.AddListener(() =>
                 {
@@ -279,11 +244,44 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
                     if (uiflow.IsBackButton)
                         parentMenusManager.Back();
-                    else if (uiflow.GoTo != null)
-                        parentMenusManager.SwitchTo(uiflow.GoTo);
+                    else
+                        parentMenusManager.SwitchTo(uiflow.targetMenuName);
                 });
             }
         }
+
+#if UNITY_EDITOR
+        private void OnHierarchyChanged()
+        {
+            if (this == null)
+                return;
+
+            var allButtons = GetComponentsInChildren<Button>(true);
+            uiFlows.RemoveAll(x => !allButtons.Contains(x.Button));
+            var nonSetButtons = allButtons.Where(x => !uiFlows.Select(y => y.Button).Contains(x)).ToList();
+            foreach (var button in nonSetButtons)
+            {
+                uiFlows.Add(new UiFlow()
+                {
+                    Button = button,
+                    targetMenuName = ""
+                });
+            }
+        }
+
+        [InitializeOnLoadMethod]
+        static void OnUnityReload()
+        {
+            var allMenus = FindObjectsByType<Menu>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var item in allMenus)
+                EditorApplication.hierarchyChanged += item.OnHierarchyChanged;
+        }
+
+        private void OnValidate()
+        {
+            SetFlows();
+        }
+#endif
     }
 
     [System.Serializable]
@@ -299,7 +297,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     {
         public bool IsBackButton;
         public Button Button;
-        public Menu GoTo;
+        public string targetMenuName;
     }
 
     [System.Serializable]

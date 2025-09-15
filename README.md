@@ -16,7 +16,7 @@ A Unity extension that provides a comprehensive helper to manage menus in Unity 
 
 ## Installation
 
-Just add this repository as a package in your project
+Add this git url as package: <pre>```https://github.com/FellipePeixoto/MenusManagerUGUI.git```</pre>
 
 ## Usage
 
@@ -35,17 +35,25 @@ Just add this repository as a package in your project
 
 - Tested on Unity 6000.0.38.
 
+## Limitations
+
+- 
+
+## Known Issues
+
+-
+
 ## Future Roadmap
 
 - [x] Include OnBeforeShow, OnShow, OnBeforeHide, OnHide
-- [ ] Add labels to better explain what each inspector option does
-- [ ] UNDO and Redo functionality
-- [ ] Better Editor Class structure
 - [ ] Add a dropdown to list the menus available from the current menu
 - [ ] Option to keep the last selected object in memory to select it by default when returning to the screen
-- [ ] Add missing parts in the API reference
+- [ ] Undo and Redo functionality
+- [ ] Add labels to better explain what each inspector option does
+- [ ] Better Editor Class structure
 - [ ] Support for Multiple Selection
-
+- [ ] Add missing parts in the API reference
+- [ ] Block repeated Menu names
 
 ## Contributing
 

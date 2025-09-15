@@ -5,8 +5,8 @@
   "description": "Tool to simplify the management of menu in game.",
   "unity": "6000.0",
   "documentationUrl": "https://github.com/FellipePeixoto/",
-  "changelogUrl": "https://github.com/FellipePeixoto/menusmanagerugui/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/FellipePeixoto/menusmanagerugui/blob/main/LICENSE",
+  "changelogUrl": "https://github.com/FellipePeixoto/MenusManagerUGUI/blob/master/CHANGELOG.md",
+  "licensesUrl": "https://github.com/FellipePeixoto/MenusManagerUGUI/blob/master/LICENSE",
   "samples": [
     {
       "displayName": "Usage Example",
