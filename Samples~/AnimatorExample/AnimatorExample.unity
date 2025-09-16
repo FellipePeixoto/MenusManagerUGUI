@@ -480,18 +480,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstSelected: {fileID: 0}
-  keepOnBackground: 1
+  keepOnBackground: 0
   scaledTime: 0
   animatorSettings:
-    InteractionOnlyWhenVisible: 1
+    ExecuteAnimationOnInit: 0
     DefaultState: MenuHidden
     HiddenState: MenuHidden
     VisibleState: MenuVisible
     VisibleParam: visible
-  menuDisplayMethod: 3
+  menuDisplayMethod: 0
   fadeIn:
     Delay: 0
-    Duration: 0.35
+    Duration: 0
     Curve:
       serializedVersion: 2
       m_Curve:
@@ -518,7 +518,7 @@ MonoBehaviour:
       m_RotationOrder: 4
   fadeOut:
     Delay: 0
-    Duration: 0.35
+    Duration: 0
     Curve:
       serializedVersion: 2
       m_Curve:
@@ -543,18 +543,20 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  uiFlows:
-  - IsBackButton: 0
-    Button: {fileID: 1222829955}
-    GoTo: {fileID: 1669157191}
-  - IsBackButton: 0
-    Button: {fileID: 1802615341}
-    GoTo: {fileID: 1664920267}
-  parentMenusManager: {fileID: 0}
+  navButtons:
+  - {fileID: 1222829958}
+  - {fileID: 1802615344}
+  owner: {fileID: 1503351613}
   onInit:
     m_PersistentCalls:
       m_Calls: []
+  onBeforeShow:
+    m_PersistentCalls:
+      m_Calls: []
   onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onBeforeHide:
     m_PersistentCalls:
       m_Calls: []
   onHide:
@@ -1058,7 +1060,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 64.3341}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1222829955
 MonoBehaviour:
@@ -1142,28 +1144,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1222829953}
   m_CullTransparentMesh: 1
---- !u!95 &1222829958
-Animator:
-  serializedVersion: 7
+--- !u!114 &1222829958
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1222829953}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d17832f0c930f7a438761a3a81f140db, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db64f0416798cc34692cc9f97a4efbdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
+  targetMenu: MenuB
 --- !u!1 &1243265849
 GameObject:
   m_ObjectHideFlags: 0
@@ -1543,14 +1537,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d1d9c7d7f4b03549b50abd7a67f00c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstSiblingIsTheDefault: 1
-  defaultMenu: {fileID: 0}
+  firstSiblingIsTheDefault: 0
+  defaultMenu: {fileID: 580569461}
   nonRepeatedNav: 0
   getMenusInChildren: 0
   menus:
   - {fileID: 580569461}
   - {fileID: 1669157191}
   - {fileID: 1664920267}
+  menusNames:
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - None
+  - MenuA
+  - MenuB
+  - MenuC
   onReachedLastMenu:
     m_PersistentCalls:
       m_Calls: []
@@ -1610,7 +1620,7 @@ MonoBehaviour:
   keepOnBackground: 0
   scaledTime: 0
   animatorSettings:
-    InteractionOnlyWhenVisible: 1
+    ExecuteAnimationOnInit: 0
     DefaultState: MenuHidden
     HiddenState: MenuHidden
     VisibleState: MenuVisible
@@ -1670,12 +1680,18 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  uiFlows: []
-  parentMenusManager: {fileID: 0}
+  navButtons: []
+  owner: {fileID: 1503351613}
   onInit:
     m_PersistentCalls:
       m_Calls: []
+  onBeforeShow:
+    m_PersistentCalls:
+      m_Calls: []
   onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onBeforeHide:
     m_PersistentCalls:
       m_Calls: []
   onHide:
@@ -1771,7 +1787,7 @@ MonoBehaviour:
   keepOnBackground: 0
   scaledTime: 0
   animatorSettings:
-    InteractionOnlyWhenVisible: 1
+    ExecuteAnimationOnInit: 0
     DefaultState: MenuHidden
     HiddenState: MenuHidden
     VisibleState: MenuVisible
@@ -1831,12 +1847,18 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  uiFlows: []
-  parentMenusManager: {fileID: 0}
+  navButtons: []
+  owner: {fileID: 1503351613}
   onInit:
     m_PersistentCalls:
       m_Calls: []
+  onBeforeShow:
+    m_PersistentCalls:
+      m_Calls: []
   onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onBeforeHide:
     m_PersistentCalls:
       m_Calls: []
   onHide:
@@ -1888,6 +1910,7 @@ GameObject:
   - component: {fileID: 1802615343}
   - component: {fileID: 1802615342}
   - component: {fileID: 1802615341}
+  - component: {fileID: 1802615344}
   m_Layer: 5
   m_Name: ButtonMenuC
   m_TagString: Untagged
@@ -1913,7 +1936,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 64.3341}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1802615341
 MonoBehaviour:
@@ -1997,6 +2020,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1802615339}
   m_CullTransparentMesh: 1
+--- !u!114 &1802615344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802615339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db64f0416798cc34692cc9f97a4efbdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
+  targetMenu: MenuC
 --- !u!1 &2122340558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2057,7 +2094,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0

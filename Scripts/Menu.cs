@@ -1,8 +1,10 @@
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -10,7 +12,7 @@ using UnityEngine.EventSystems;
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
     [AddComponentMenu("DevPeixoto/UI/Menu Manager/Menu")]
-    [RequireComponent(typeof(CanvasGroup), typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public class Menu : MonoBehaviour
     {
         [Header("Event System")]
@@ -44,7 +46,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
         Animator animator;
-        public Animator Animator
+        internal Animator Animator
         {
             get
             {
@@ -59,6 +61,10 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         int sibblingIndex;
         Coroutine fadeCoroutine;
+
+#if UNITY_EDITOR
+        RuntimeAnimatorController lastController;
+#endif
 
         public void Init(bool visible)
         {
@@ -77,11 +83,16 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.Play(
-                        visible ? animatorSettings.VisibleState : animatorSettings.DefaultState,
-                        0,
-                        animatorSettings.ExecuteAnimationOnInit ? 0 : 1);
-                    Animator.SetBool(animatorSettings.VisibleParam, visible);
+                    if (Animator == null)
+                    {
+                        Debug.LogError("No Animator Component");
+                        break;
+                    }
+                    Animator.SetBool(AnimatorSettings.VisibleParam, visible);
+                    if (!animatorSettings.ExecuteAnimationOnInit)
+                    {
+                        Animator.Play(visible ? AnimatorSettings.VisibleState : AnimatorSettings.DefaultState);
+                    }
                     HandleCanvasGroupOnAnimatorMode(visible);
                     break;
             }
@@ -127,7 +138,12 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.SetBool(animatorSettings.VisibleParam, true);
+                    if (Animator == null)
+                    {
+                        Debug.LogError("No Animator Component");
+                        break;
+                    }
+                    Animator.SetBool(AnimatorSettings.VisibleParam, true);
                     HandleCanvasGroupOnAnimatorMode(true);
                     break;
             }
@@ -172,7 +188,12 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.SetBool(animatorSettings.VisibleParam, false);
+                    if (Animator == null)
+                    {
+                        Debug.LogError("No Animator Component");
+                        break;
+                    }
+                    Animator.SetBool(AnimatorSettings.VisibleParam, false);
                     HandleCanvasGroupOnAnimatorMode(false);
                     break;
             }
@@ -259,6 +280,26 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             SetupNavButtons();
         }
 
+        internal void HandleChangeToAnimatorMode(bool animatorMode)
+        {
+            if (animatorMode)
+            {
+                if (Animator == null)
+                {
+                    gameObject.AddComponent<Animator>();
+                    Animator.runtimeAnimatorController = lastController;
+                }
+            }
+            else
+            {
+                if (Animator != null)
+                {
+                    lastController = Animator.runtimeAnimatorController;
+                    DestroyImmediate(Animator);
+                }
+            }
+        }
+
         [InitializeOnLoadMethod]
         static void OnUnityReload()
         {
@@ -301,10 +342,10 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     public class AnimatorSettings
     {
         public bool ExecuteAnimationOnInit;
-        [HideInInspector] public string DefaultState = "MenuHidden";
-        [HideInInspector] public string HiddenState = "MenuHidden";
-        [HideInInspector] public string VisibleState = "MenuVisible";
-        [HideInInspector] public string VisibleParam = "visible";
+        public static readonly string DefaultState = "MenuHidden";
+        public static readonly string HiddenState = "MenuHidden";
+        public static readonly string VisibleState = "MenuVisible";
+        public static readonly string VisibleParam = "visible";
     }
 
     public enum MenuDisplayMethod
@@ -314,6 +355,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         [Description("Control with Canvas Group")]
         CanvasGroup = 1,
         [Description("Contro with Animator")]
-        Animator = 3,
+        Animator = 2,
     }
 }
