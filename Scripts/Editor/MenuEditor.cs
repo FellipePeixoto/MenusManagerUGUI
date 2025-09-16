@@ -79,22 +79,15 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             {
                 VisualElement container = new VisualElement();
                 container.style.width = new StyleLength(new Length(90, LengthUnit.Percent));
-                container.style.flexDirection = FlexDirection.Row;
                 container.style.marginTop = new StyleLength(5);
                 container.style.marginBottom = new StyleLength(5);
                 Add(container);
 
                 objectField = new ObjectField() { name = k_objField };
-                objectField.labelElement.style.minWidth = 0;
-                objectField.labelElement.style.flexShrink = 1;
-                objectField.style.marginRight = 5;
                 FieldsStyles(objectField);
                 container.Add(objectField);
 
                 dropdown = new DropdownField("Go To menu") { name = k_dropdown };
-                dropdown.labelElement.style.minWidth = 0;
-                dropdown.labelElement.style.flexShrink = 1;
-                dropdown.style.marginLeft = 5;
                 FieldsStyles(dropdown);
                 container.Add(dropdown);
             }
@@ -120,7 +113,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             void FieldsStyles(VisualElement v)
             {
-                v.style.width = new StyleLength(new Length(50, LengthUnit.Percent));
+                v.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
                 v.style.fontSize = new StyleLength(13);
                 v.style.alignSelf = Align.Center;
             }

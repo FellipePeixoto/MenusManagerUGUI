@@ -6,9 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Add a dropdown to list the menus available from the current menu
+- Nothing in progress
 
 ### Added
+- Add a dropdown to list the menus available from the current menu
 - Merge Canvas Group Method with Fade method
 - Include OnBeforeShow, OnShow, OnBeforeHide, OnHide
 

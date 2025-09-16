@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using System.Linq.Expressions;
 using UnityEditor;
 #endif
 using UnityEngine;
@@ -8,7 +7,9 @@ using UnityEngine;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
+#if UNITY_EDITOR
     [Serializable]
+#endif
     public class ButtonMenuNav : ButtonMenuBase 
     {
         [SerializeField] internal MenusManager owner;

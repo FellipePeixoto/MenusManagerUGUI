@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
@@ -24,7 +22,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         [SerializeField] Fade fadeIn;
         [SerializeField] Fade fadeOut;
         [SerializeField] List<ButtonMenuNav> navButtons = new List<ButtonMenuNav>();
-        [SerializeReference, HideInInspector] internal MenusManager owner;
+        [SerializeField, HideInInspector] internal MenusManager owner;
         public UnityEvent onInit;
         public UnityEvent onBeforeShow;
         public UnityEvent onShow;
