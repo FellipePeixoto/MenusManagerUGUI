@@ -52,7 +52,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             var options = MenuOptionsSingleton.Instance.GetOptions(parent as MenusManager);
             var navigationList = new ListView()
             {
-                headerTitle = "Buttons In Menu",
+                headerTitle = "Nav Buttons In Menu",
                 showBoundCollectionSize = false,
                 showFoldoutHeader = true,
                 showAlternatingRowBackgrounds = AlternatingRowBackground.All,
@@ -70,51 +70,50 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         class UIFlowTemplate : VisualElement
         {
             public static readonly string k_label = "UIFlowLabel";
-            public static readonly string k_toggle = "UIFlowToggle";
             public static readonly string k_dropdown = "UIFlowDropdown";
 
             Label label;
-            Toggle toggle;
             DropdownField dropdown;
 
             public UIFlowTemplate()
             {
+                VisualElement container = new VisualElement();
+                container.style.flexDirection = FlexDirection.Row;
+                container.style.marginTop = new StyleLength(5);
+                container.style.marginBottom = new StyleLength(5);
+                Add(container);
+
                 label = new Label() { name = k_label };
-                Add(label);
+                FieldsStyles(label);
+                container.Add(label);
 
-                toggle = new Toggle("Back to previous menu") { name = k_toggle };
-                Add(toggle);
-
-                dropdown = new DropdownField("Go To menu: ") { name = k_dropdown };
-                Add(dropdown);
+                dropdown = new DropdownField("Go To menu") { name = k_dropdown };
+                FieldsStyles(dropdown);
+                container.Add(dropdown);
             }
 
             public void Bind(SerializedProperty prop, List<string> options)
             {
-                label.text = prop.FindPropertyRelative("Button").objectReferenceValue.name;
+                var targetButton = prop.FindPropertyRelative("Button").objectReferenceValue;
+                if (targetButton == null)
+                    return;
 
-                toggle.BindProperty(prop.FindPropertyRelative("IsBackButton"));
-                toggle.RegisterValueChangedCallback(e => dropdown.style.display = e.newValue ? DisplayStyle.None : DisplayStyle.Flex);
+                label.text = targetButton.name;
 
                 var dropdownField = this.Q<DropdownField>(k_dropdown);
                 var targetMenuProp = prop.FindPropertyRelative("targetMenuName");
                 dropdown.value = targetMenuProp.stringValue;
                 dropdown.BindProperty(targetMenuProp);
-                dropdown.choices = options;
+                dropdown.choices = options == null ? new List<string>() : options;
+                dropdown.choices.Insert(0, "None");
             }
-        }
 
-        List<string> SerializedStringList(SerializedProperty property)
-        {
-            var list = new List<string>();
-
-            for (int i = 0; i < property.arraySize; i++)
+            void FieldsStyles(VisualElement v)
             {
-                var item = property.GetArrayElementAtIndex(i);
-                list.Add(item.stringValue);
+                v.style.width = new StyleLength(new Length(50, LengthUnit.Percent));
+                v.style.fontSize = new StyleLength(13);
+                v.style.alignSelf = Align.Center;
             }
-
-            return list;
         }
     }
 

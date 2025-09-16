@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -88,6 +89,10 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             }
 
             SetFlows();
+            var buttonBack = GetComponent<ButtonMenuBack>();
+            if (buttonBack != null)
+                buttonBack.RegisterUniqueCallback(Back);
+
             onInit?.Invoke();
         }
 
@@ -178,6 +183,12 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 onHide?.Invoke();
         }
 
+        public void Back()
+        {
+            if (parentMenusManager != null)
+                parentMenusManager.Back();
+        }
+
         IEnumerator CanvasGroupFade(Fade fade, bool fadeIn = true)
         {
             if (!fadeIn)
@@ -231,10 +242,20 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         void SetFlows()
         {
-            foreach (var uiflow in uiFlows)
+            var allButtons = GetComponentsInChildren<ButtonMenuNav>(true);
+            uiFlows.RemoveAll(x => !allButtons.Contains(x.Button));
+            var nonSetButtons = allButtons.Where(x => !uiFlows.Select(y => y.Button).Contains(x)).ToList();
+            foreach (var button in nonSetButtons)
             {
-                uiflow.Button.onClick.RemoveAllListeners();
-                uiflow.Button.onClick.AddListener(() =>
+                var uiFlow = new UiFlow()
+                {
+                    Button = button,
+                    targetMenuName = "None"
+                };
+
+                uiFlows.Add(uiFlow);
+
+                uiFlow.Button.RegisterUniqueCallback(() =>
                 {
                     if (parentMenusManager == null)
                     {
@@ -242,31 +263,18 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                         return;
                     }
 
-                    if (uiflow.IsBackButton)
-                        parentMenusManager.Back();
-                    else
-                        parentMenusManager.SwitchTo(uiflow.targetMenuName);
+                    parentMenusManager.SwitchTo(uiFlow.targetMenuName);
                 });
             }
         }
 
 #if UNITY_EDITOR
-        private void OnHierarchyChanged()
+        private void DelayCall()
         {
             if (this == null)
                 return;
 
-            var allButtons = GetComponentsInChildren<Button>(true);
-            uiFlows.RemoveAll(x => !allButtons.Contains(x.Button));
-            var nonSetButtons = allButtons.Where(x => !uiFlows.Select(y => y.Button).Contains(x)).ToList();
-            foreach (var button in nonSetButtons)
-            {
-                uiFlows.Add(new UiFlow()
-                {
-                    Button = button,
-                    targetMenuName = ""
-                });
-            }
+            SetFlows();
         }
 
         [InitializeOnLoadMethod]
@@ -274,10 +282,15 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         {
             var allMenus = FindObjectsByType<Menu>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var item in allMenus)
-                EditorApplication.hierarchyChanged += item.OnHierarchyChanged;
+                EditorApplication.delayCall += item.DelayCall;
         }
 
         private void OnValidate()
+        {
+            SetFlows();
+        }
+
+        private void Reset()
         {
             SetFlows();
         }
@@ -295,8 +308,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     [System.Serializable]
     public class UiFlow
     {
-        public bool IsBackButton;
-        public Button Button;
+        public ButtonMenuNav Button;
         public string targetMenuName;
     }
 

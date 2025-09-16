@@ -2,24 +2,30 @@
 using DevPeixoto.UI.MenuManager.UGUI;
 using System.Collections.Generic;
 
-public class MenuOptionsSingleton
+namespace DevPeixoto.UI.MenuManager.UGUI
 {
-    static MenuOptionsSingleton instance;
-    public static MenuOptionsSingleton Instance
+    public class MenuOptionsSingleton
     {
-        get 
+        static MenuOptionsSingleton instance;
+        public static MenuOptionsSingleton Instance
         {
-            if (instance == null)
+            get
             {
-                instance = new MenuOptionsSingleton();
+                if (instance == null)
+                {
+                    instance = new MenuOptionsSingleton();
+                }
+                return instance;
             }
-            return instance; 
         }
-    }
 
-    public List<string> GetOptions(MenusManager target)
-    {
-        return target.menusNames;
+        public List<string> GetOptions(MenusManager target)
+        {
+            if (target == null)
+                return null;
+
+            return target.menusNames;
+        }
     }
 }
 #endif

@@ -138,12 +138,13 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
 #if UNITY_EDITOR
-        private void OnHierarchyChanged()
+        private void DelayCall()
         {
             foreach (var menu in menus)
             {
                 if (menu != null && !menusNames.Contains(menu.name))
                 {
+                    menu.parentMenusManager = this;
                     menusNames.Add(menu.name);
                 }
             }
@@ -158,19 +159,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         {
             var allMenus = FindObjectsByType<MenusManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var item in allMenus)
-                EditorApplication.hierarchyChanged += item.OnHierarchyChanged;
-        }
-
-        private void OnValidate()
-        {
-            OnHierarchyChanged();
-            foreach (var menu in menus)
-            {
-                if (menu != null)
-                {
-                    menu.parentMenusManager = this;
-                }
-            }
+                EditorApplication.delayCall += item.DelayCall;
         }
 #endif
     }
