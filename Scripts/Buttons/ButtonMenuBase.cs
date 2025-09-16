@@ -8,7 +8,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     public abstract class ButtonMenuBase : MonoBehaviour
     {
         Button button;
-        UnityAction action;
 
         protected Button Button
         {
@@ -23,47 +22,16 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             }
         }
 
-        public virtual void RegisterUniqueCallback(UnityAction action)
+        protected virtual void OnEnable()
         {
-            if (action == null)
-                return;
-
-            if (this.action == null)
-            {
-                this.action = action;
-                Button.onClick.AddListener(this.action);
-            }
-
-            if (this.action != action)
-            {
-                Button.onClick.RemoveListener(this.action);
-                this.action = action;
-                Button.onClick.AddListener(this.action);
-            }
+            Button.onClick.AddListener(NavigateToDestiny);
         }
 
-        private void OnEnable()
+        protected virtual void OnDisable()
         {
-            if (!IsActionRegistered(action))
-             Button.onClick.AddListener(action);
+            Button.onClick.RemoveListener(NavigateToDestiny);
         }
 
-        private void OnDisable()
-        {
-            Button.onClick.RemoveListener(action);
-        }
-
-        bool IsActionRegistered(UnityAction action)
-        {
-            for (int i = 0; i < Button.onClick.GetPersistentEventCount(); i++)
-            {
-                if ((UnityEngine.Object)Button.onClick.GetPersistentTarget(i) == (UnityEngine.Object)action.Target &&
-                    Button.onClick.GetPersistentMethodName(i) == action.Method.Name)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        protected abstract void NavigateToDestiny();
     }
 }

@@ -51,7 +51,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 if (menu == null)
                     continue;
 
-                menu.parentMenusManager = this;
+                menu.owner = this;
                 menu.gameObject.SetActive(true);
                 if (menu == defaultMenu)
                 {
@@ -138,19 +138,20 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
 #if UNITY_EDITOR
-        private void DelayCall()
+        void InEditorSetup()
         {
-            foreach (var menu in menus)
-            {
-                if (menu != null && !menusNames.Contains(menu.name))
-                {
-                    menu.parentMenusManager = this;
-                    menusNames.Add(menu.name);
-                }
-            }
+            SetupChildMenus();
+            SetupMenuNamesList();
+        }
 
-            var currentMenusNames = menus.Where(menu => menu != null).Select(x => x.name).ToList();
-            menusNames.RemoveAll(x => !currentMenusNames.Contains(x));
+        void SetupChildMenus()
+        {
+            menus.Where(m => m != null).ToList().ForEach(m => m.owner = this);
+        }
+
+        void SetupMenuNamesList()
+        {
+            menusNames = menus.Where(m => m != null).ToList().Select(m => m.name).ToList();
             menusNames.Sort();
         }
 
@@ -159,7 +160,20 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         {
             var allMenus = FindObjectsByType<MenusManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var item in allMenus)
-                EditorApplication.delayCall += item.DelayCall;
+            {
+                EditorApplication.delayCall += item.InEditorSetup;
+                EditorApplication.hierarchyChanged += item.InEditorSetup;
+            }
+        }
+
+        private void OnValidate()
+        {
+            InEditorSetup();
+        }
+
+        private void Reset()
+        {
+            InEditorSetup();
         }
 #endif
     }

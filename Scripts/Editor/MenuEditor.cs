@@ -47,8 +47,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             eventsFoldout.Add(new PropertyField(onHideProp));
             root.Add(eventsFoldout);
 
-            SerializedProperty uiFlowsProp = serializedObject.FindProperty("uiFlows");
-            var parent = serializedObject.FindProperty("parentMenusManager").objectReferenceValue;
+            SerializedProperty uiFlowsProp = serializedObject.FindProperty("navButtons");
+            var parent = serializedObject.FindProperty("owner").objectReferenceValue;
             var options = MenuOptionsSingleton.Instance.GetOptions(parent as MenusManager);
             var navigationList = new ListView()
             {
@@ -69,39 +69,49 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         class UIFlowTemplate : VisualElement
         {
-            public static readonly string k_label = "UIFlowLabel";
-            public static readonly string k_dropdown = "UIFlowDropdown";
+            public static readonly string k_objField = "NavObjField";
+            public static readonly string k_dropdown = "NavDropdown";
 
-            Label label;
+            ObjectField objectField;
             DropdownField dropdown;
 
             public UIFlowTemplate()
             {
                 VisualElement container = new VisualElement();
+                container.style.width = new StyleLength(new Length(90, LengthUnit.Percent));
                 container.style.flexDirection = FlexDirection.Row;
                 container.style.marginTop = new StyleLength(5);
                 container.style.marginBottom = new StyleLength(5);
                 Add(container);
 
-                label = new Label() { name = k_label };
-                FieldsStyles(label);
-                container.Add(label);
+                objectField = new ObjectField() { name = k_objField };
+                objectField.labelElement.style.minWidth = 0;
+                objectField.labelElement.style.flexShrink = 1;
+                objectField.style.marginRight = 5;
+                FieldsStyles(objectField);
+                container.Add(objectField);
 
                 dropdown = new DropdownField("Go To menu") { name = k_dropdown };
+                dropdown.labelElement.style.minWidth = 0;
+                dropdown.labelElement.style.flexShrink = 1;
+                dropdown.style.marginLeft = 5;
                 FieldsStyles(dropdown);
                 container.Add(dropdown);
             }
 
             public void Bind(SerializedProperty prop, List<string> options)
             {
-                var targetButton = prop.FindPropertyRelative("Button").objectReferenceValue;
-                if (targetButton == null)
+                if (prop.objectReferenceValue == null)
                     return;
 
-                label.text = targetButton.name;
+                var button = new SerializedObject(prop.objectReferenceValue);
+
+                objectField.label = "Ref Nav";
+                objectField.value = prop.objectReferenceValue;
+                objectField.SetEnabled(false);
 
                 var dropdownField = this.Q<DropdownField>(k_dropdown);
-                var targetMenuProp = prop.FindPropertyRelative("targetMenuName");
+                var targetMenuProp = button.FindProperty("targetMenu");
                 dropdown.value = targetMenuProp.stringValue;
                 dropdown.BindProperty(targetMenuProp);
                 dropdown.choices = options == null ? new List<string>() : options;

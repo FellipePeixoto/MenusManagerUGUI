@@ -7,6 +7,14 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 {
     public class ButtonMenuBack : ButtonMenuBase 
     {
+        [SerializeField] internal MenusManager owner;
+
+        protected override void NavigateToDestiny()
+        {
+            if (owner != null)
+                owner.Back();
+        }
+
 #if UNITY_EDITOR
         [MenuItem("GameObject/DevPeixoto/Menus Manager/Back Button - TextMeshPro")]
         public static void CreateFromHierachyButtonNav(MenuCommand menuCommand)

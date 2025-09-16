@@ -1,4 +1,6 @@
 #if UNITY_EDITOR
+using System;
+using System.Linq.Expressions;
 using UnityEditor;
 #endif
 using UnityEngine;
@@ -6,8 +8,18 @@ using UnityEngine;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
+    [Serializable]
     public class ButtonMenuNav : ButtonMenuBase 
     {
+        [SerializeField] internal MenusManager owner;
+        [SerializeField] internal string targetMenu = "None";
+
+        protected override void NavigateToDestiny()
+        {
+            if (owner != null)
+                owner.SwitchTo(targetMenu);
+        }
+
 #if UNITY_EDITOR
         [MenuItem("GameObject/DevPeixoto/Menus Manager/Nav Button - TextMeshPro")]
         public static void CreateFromHierachyButtonNav(MenuCommand menuCommand)
