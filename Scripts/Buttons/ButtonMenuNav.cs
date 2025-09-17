@@ -8,7 +8,7 @@ using UnityEngine;
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
 #if UNITY_EDITOR
-    [Serializable]
+    [AddComponentMenu("DevPeixoto/UI/Menu Manager/Nav Button")]
 #endif
     public class ButtonMenuNav : ButtonMenuBase 
     {

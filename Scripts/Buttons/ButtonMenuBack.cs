@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
+    [AddComponentMenu("DevPeixoto/UI/Menu Manager/Nav Button")]
     public class ButtonMenuBack : ButtonMenuBase 
     {
         [SerializeField] internal MenusManager owner;
