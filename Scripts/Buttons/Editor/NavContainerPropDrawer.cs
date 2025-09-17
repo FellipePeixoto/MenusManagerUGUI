@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
@@ -28,7 +29,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             DropdownField targetMenuDropDownField = new DropdownField("Target Menu");
             var targetMenuProp = prop.FindPropertyRelative("targetMenu");
             targetMenuDropDownField.BindProperty(targetMenuProp);
-            targetMenuDropDownField.choices = MenuOptionsSingleton.Instance.GetOptions(ownerProp.objectReferenceValue as MenusManager);
+            var options = MenuOptionsSingleton.Instance.GetOptions(ownerProp.objectReferenceValue as MenusManager);
+            targetMenuDropDownField.choices = options != null ? options : new List<string>();
             targetMenuDropDownField.choices.Insert(0, "None");
             targetMenuDropDownField.style.marginTop = 5;
             targetMenuDropDownField.style.marginBottom = 5;

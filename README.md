@@ -41,7 +41,7 @@ Add this git url as package: <pre>```https://github.com/FellipePeixoto/MenusMana
 
 ## Known Issues
 
--
+- On add a Nav Button, the owner isn't loaded immediatelly. It's necessary to redraw the inspector to load the owner and setup it.
 
 ## Future Roadmap
 

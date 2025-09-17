@@ -5,6 +5,7 @@ using UnityEngine.UI;
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
     [RequireComponent(typeof(Button))]
+    [DisallowMultipleComponent]
     public abstract class ButtonMenuBase : MonoBehaviour
     {
         Button button;

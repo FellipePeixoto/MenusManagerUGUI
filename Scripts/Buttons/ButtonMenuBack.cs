@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
-    [AddComponentMenu("DevPeixoto/UI/Menu Manager/Nav Button")]
+    [AddComponentMenu("DevPeixoto/UI/Menu Manager/Back Button")]
     public class ButtonMenuBack : ButtonMenuBase 
     {
-        [SerializeField] internal MenusManager owner;
+        internal MenusManager owner;
 
         protected override void NavigateToDestiny()
         {

@@ -7,12 +7,10 @@ using UnityEngine;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
-#if UNITY_EDITOR
     [AddComponentMenu("DevPeixoto/UI/Menu Manager/Nav Button")]
-#endif
     public class ButtonMenuNav : ButtonMenuBase 
     {
-        [SerializeField] internal NavContainer navContainer;
+        [SerializeField] internal NavContainer navContainer = new NavContainer();
 
         protected override void NavigateToDestiny()
         {
