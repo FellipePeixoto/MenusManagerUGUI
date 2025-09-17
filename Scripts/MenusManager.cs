@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using static UnityEditor.U2D.ScriptablePacker;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
@@ -24,7 +25,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         private void Awake()
         {
-            var bgMenusParent = new GameObject("BackgroundMenusParent");
+            var bgMenusParent = new GameObject("BackgroundParent");
             backgroundMenusParent = bgMenusParent.GetComponent<Transform>();
             backgroundMenusParent.SetParent(transform);
             backgroundMenusParent.SetSiblingIndex(0);
@@ -36,14 +37,14 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             if (defaultMenu != null)
             {
-                defaultMenu.Show(true, transform);
+                defaultMenu.Show();
                 currentMenuList.Add(defaultMenu);
             }
             else if (firstSiblingIsTheDefault && menus.Count > 0)
             { 
                 defaultMenu = menus[0];
                 currentMenuList.Add(defaultMenu);
-                defaultMenu.Show(true, transform);
+                defaultMenu.Show();
             }
 
             foreach (var menu in menus)
@@ -52,6 +53,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     continue;
 
                 menu.owner = this;
+                menu.backgroundParent = backgroundMenusParent;
                 menu.gameObject.SetActive(true);
                 if (menu == defaultMenu)
                 {
@@ -68,7 +70,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         /// Switchs to other menu
         /// </summary>
         /// <param name="menu">The target menu</param>
-        public void SwitchTo(Menu menu)
+        public void Open(Menu menu)
         {
             if (menu == null)
                 return;
@@ -88,15 +90,51 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 return;
             }
 
-            Peek().Hide(true, backgroundMenusParent);
+            Peek().Hide();
 
-            menu.Show(true, transform);
+            menu.Show();
+
             currentMenuList.Add(menu);
         }
 
-        public void SwitchTo(string menuName)
+        public void Open(string menuName)
         {
-            SwitchTo(menus.Find(x => x.name == menuName));
+            Open(menus.Find(x => x.name == menuName));
+        }
+
+        public void OpenOverlay(Menu menu)
+        {
+            if (menu == null)
+                return;
+
+            if (menu == defaultMenu)
+                Debug.LogError("Can't open default menu as Overlay");
+
+            if (!menus.Contains(menu))
+            {
+                Debug.LogError($"The Menu {menu.name} isn't part of this manager ({name}) group");
+                return;
+            }
+
+            var peek = Peek();
+            if (peek == menu)
+                return;
+
+            if (nonRepeatedNav && currentMenuList.Contains(menu))
+            {
+                ReInsert(menu);
+                return;
+            }
+
+            peek.transform.SetParent(backgroundMenusParent);
+            menu.Show();
+
+            currentMenuList.Add(menu);
+        }
+
+        public void OpenOverlay(string menuName)
+        {
+            OpenOverlay(menus.Find(x => x.name == menuName));
         }
 
         /// <summary>
@@ -110,8 +148,11 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 return;
             }
 
-            Pop().Hide(true, backgroundMenusParent);
-            Peek().Show(true, transform);
+            var pop = Pop();
+            pop.Hide();
+
+            var peek = Peek();
+            peek.Show();
         }
 
         Menu Peek() 
@@ -134,7 +175,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             Peek().Hide();
             currentMenuList.Remove(menu);
             currentMenuList.Add(menu);
-            menu.Show(true, transform);
+            menu.Show();
         }
 
 #if UNITY_EDITOR

@@ -47,6 +47,7 @@ Add this git url as package: <pre>```https://github.com/FellipePeixoto/MenusMana
 
 - [x] Include OnBeforeShow, OnShow, OnBeforeHide, OnHide
 - [x] Add a dropdown to list the menus available from the current menu
+- [ ] Expose more options in the API
 - [ ] Option to keep the last selected object in memory to select it by default when returning to the screen
 - [ ] Undo and Redo functionality
 - [ ] Add labels to better explain what each inspector option does

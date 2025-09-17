@@ -15,9 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Great Refactor
+- SwitchTo renamed to Open
+- Replaced the Keep On Background option OpenOverlay. Function passed to the Menu Manager
+- Add of internals to keep the flow clean
+- Add scaled time for CanvasGroup and Animator modes only
+- Grouped Fades
 
 ### Deprecated
-- Nothing
+- UIFlow container
 
 ### Removed
 - XML: Inspector UI made by code only

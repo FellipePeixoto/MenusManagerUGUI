@@ -79,8 +79,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 showFoldoutHeader = true,
                 showAlternatingRowBackgrounds = AlternatingRowBackground.All,
                 virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
-                makeItem = () => new UIFlowTemplate(),
-                bindItem = (e, i) => (e as UIFlowTemplate).Bind(uiFlowsProp.GetArrayElementAtIndex(i), options)
             };
             navigationList.BindProperty(uiFlowsProp);
             root.Add(navigationList);
@@ -164,7 +162,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 {
                     case MenuDisplayMethod.State:
                         if (gameObjectContainer == null)
-                            gameObjectContainer = new GameObjectStateMethodContainer();
+                            gameObjectContainer = new GameObjectStateMethodContainer(serializedObject);
                         
                         return gameObjectContainer;
 
@@ -186,15 +184,12 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             class GameObjectStateMethodContainer: VisualElement
             {
-                public GameObjectStateMethodContainer() 
-                {
-                    Add(new Label("Game Object State"));
-                }
+                public GameObjectStateMethodContainer(SerializedObject obj) { }
             }
 
             class CanvasGroupMethodContainer : VisualElement
             {
-                public PropertyField ScaledTimeField { get; private set; }
+                public Toggle ScaledTimeToggle { get; private set; }
                 public PropertyField FadeInGroup { get; private set; }
                 public PropertyField FadeOutGroup { get; private set; }
 
@@ -202,28 +197,40 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 {
                     Add(new Label("Fade Options"));
 
-                    SerializedProperty scaledTimeProp = obj.FindProperty("scaledTime");
-                    Add(ScaledTimeField = new PropertyField(scaledTimeProp));
+                    SerializedProperty prop = obj.FindProperty("fades");
 
-                    SerializedProperty fadeInProp = obj.FindProperty("fadeIn");
+                    SerializedProperty scaledTimeProp = prop.FindPropertyRelative("UseScaledTime");
+                    ScaledTimeToggle = new Toggle("Use Scaled Time");
+                    ScaledTimeToggle.BindProperty(scaledTimeProp);
+                    Add(ScaledTimeToggle);
+
+                    SerializedProperty fadeInProp = prop.FindPropertyRelative("FadeIn");
                     Add(FadeInGroup = new PropertyField(fadeInProp));
                     
-                    SerializedProperty fadeOutProp = obj.FindProperty("fadeOut");
+                    SerializedProperty fadeOutProp = prop.FindPropertyRelative("FadeOut");
                     Add(FadeOutGroup = new PropertyField(fadeOutProp));
                 }
             }
 
             class AnimatorMethodContainer: VisualElement
             {
-                Button generateAnimatorButton;
+                Toggle ScaledTimeToggle;
                 Toggle executeOnInitToggle;
+                Button generateAnimatorButton;
 
                 public AnimatorMethodContainer(SerializedObject obj)
                 {
                     Add(new Label("Animator Method"));
 
+                    SerializedProperty prop = obj.FindProperty("animatorSettings");
+
+                    SerializedProperty scaledTimeProp = prop.FindPropertyRelative("UseScaledTime");
+                    ScaledTimeToggle = new Toggle("Use Scaled Time");
+                    ScaledTimeToggle.BindProperty(scaledTimeProp);
+                    Add(ScaledTimeToggle);
+
                     executeOnInitToggle = new Toggle("Execute on Init");
-                    executeOnInitToggle.BindProperty(obj.FindProperty("animatorSettings").FindPropertyRelative("ExecuteAnimationOnInit"));
+                    executeOnInitToggle.BindProperty(prop.FindPropertyRelative("ExecuteAnimationOnInit"));
                     Add(executeOnInitToggle);
 
                     generateAnimatorButton = new Button() { text = "Create Animator Controller" };
@@ -284,58 +291,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
                     return controller;
                 }
-            }
-        }
-
-        class UIFlowTemplate : VisualElement
-        {
-            public static readonly string k_objField = "NavObjField";
-            public static readonly string k_dropdown = "NavDropdown";
-
-            ObjectField objectField;
-            DropdownField dropdown;
-
-            public UIFlowTemplate()
-            {
-                VisualElement container = new VisualElement();
-                container.style.width = new StyleLength(new Length(90, LengthUnit.Percent));
-                container.style.marginTop = new StyleLength(5);
-                container.style.marginBottom = new StyleLength(5);
-                Add(container);
-
-                objectField = new ObjectField() { name = k_objField };
-                FieldsStyles(objectField);
-                container.Add(objectField);
-
-                dropdown = new DropdownField("Go To menu") { name = k_dropdown };
-                FieldsStyles(dropdown);
-                container.Add(dropdown);
-            }
-
-            public void Bind(SerializedProperty prop, List<string> options)
-            {
-                if (prop.objectReferenceValue == null)
-                    return;
-
-                var button = new SerializedObject(prop.objectReferenceValue);
-
-                objectField.label = "Ref Nav";
-                objectField.value = prop.objectReferenceValue;
-                objectField.SetEnabled(false);
-
-                var dropdownField = this.Q<DropdownField>(k_dropdown);
-                var targetMenuProp = button.FindProperty("targetMenu");
-                dropdown.value = targetMenuProp.stringValue;
-                dropdown.BindProperty(targetMenuProp);
-                dropdown.choices = options == null ? new List<string>() : options;
-                dropdown.choices.Insert(0, "None");
-            }
-
-            void FieldsStyles(VisualElement v)
-            {
-                v.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
-                v.style.fontSize = new StyleLength(13);
-                v.style.alignSelf = Align.Center;
             }
         }
 

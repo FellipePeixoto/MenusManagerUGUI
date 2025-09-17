@@ -12,13 +12,36 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 #endif
     public class ButtonMenuNav : ButtonMenuBase 
     {
-        [SerializeField] internal MenusManager owner;
-        [SerializeField] internal string targetMenu = "None";
+        [SerializeField] internal NavContainer navContainer;
 
         protected override void NavigateToDestiny()
         {
-            if (owner != null)
-                owner.SwitchTo(targetMenu);
+            if (navContainer.owner == null)
+                return;
+
+            if (navContainer.Overlay)
+                navContainer.owner.OpenOverlay(navContainer.targetMenu);
+            else
+                navContainer.owner.Open(navContainer.targetMenu);
+        }
+
+        private void OnValidate()
+        {
+            navContainer.selfRef = this;
+        }
+
+        private void Reset()
+        {
+            navContainer.selfRef = this;
+        }
+
+        [Serializable]
+        internal class NavContainer
+        {
+            public ButtonMenuNav selfRef;
+            public MenusManager owner;
+            public string targetMenu = "None";
+            public bool Overlay;
         }
 
 #if UNITY_EDITOR
