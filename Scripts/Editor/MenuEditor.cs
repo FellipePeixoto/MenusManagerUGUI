@@ -1,5 +1,7 @@
 #if UNITY_EDITOR
+using Codice.Client.BaseCommands;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
@@ -18,209 +20,285 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         public override VisualElement CreateInspectorGUI()
         {
-            root = Resources.Load<VisualTreeAsset>("XML/MenuEditor").CloneTree();
+            root = new VisualElement();
 
-            VisualElement topOptions = root.Q<VisualElement>("TopOptions");
-            
-            SerializedProperty firstSelectedProp = serializedObject.FindProperty("firstSelected");
-            topOptions.Add(new PropertyField(firstSelectedProp));
+            #region FIRST MENU SELECTABLE
+            try
+            {
+                SerializedProperty firstSelectedProp = serializedObject.FindProperty("firstSelected");
+                root.Add(new PropertyField(firstSelectedProp));
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            #endregion
 
-            SerializedProperty menuDisplayMethodProp = serializedObject.FindProperty("menuDisplayMethod");
+            #region KEEP ON BACKGROUND
             SerializedProperty keepOnBackgroundProp = serializedObject.FindProperty("keepOnBackground");
-            topOptions.Add(new PropertyField(keepOnBackgroundProp));
+            root.Add(new PropertyField(keepOnBackgroundProp));
+            #endregion
 
-            new XmlComponents(root, (Menu)target, serializedObject);
+            #region DISPLAY METHOD
+            try
+            {
+                var displayMethod = (MenuDisplayMethod)serializedObject.FindProperty("menuDisplayMethod").enumValueFlag;
+                var container = new DisplayMetohdContainer(serializedObject);
+                root.Add(container);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            #endregion
 
+            #region EVENTS
             Foldout eventsFoldout = new Foldout();
             eventsFoldout.text = "Events";
             SerializedProperty onInitProp = serializedObject.FindProperty("onInit");
+            SerializedProperty onBeforeShowProp = serializedObject.FindProperty("onBeforeShow");
             SerializedProperty onShowProp = serializedObject.FindProperty("onShow");
+            SerializedProperty onBeforeHideProp = serializedObject.FindProperty("onBeforeHide");
             SerializedProperty onHideProp = serializedObject.FindProperty("onHide");
             eventsFoldout.Add(new PropertyField(onInitProp));
+            eventsFoldout.Add(new PropertyField(onBeforeShowProp));
             eventsFoldout.Add(new PropertyField(onShowProp));
+            eventsFoldout.Add(new PropertyField(onBeforeHideProp));
             eventsFoldout.Add(new PropertyField(onHideProp));
             root.Add(eventsFoldout);
+            #endregion
 
-            ((Menu)target).LoadUiFlow();
-            SerializedProperty uiFlowsProp = serializedObject.FindProperty("uiFlows");
-            for (int i = 0; i < uiFlowsProp.arraySize; i++)
+            #region NAVIGATION
+            SerializedProperty uiFlowsProp = serializedObject.FindProperty("navButtons");
+            var parent = serializedObject.FindProperty("owner").objectReferenceValue;
+            var options = MenuOptionsSingleton.Instance.GetOptions(parent as MenusManager);
+            var navigationList = new ListView()
             {
-                SerializedProperty uiFlowProp = uiFlowsProp.GetArrayElementAtIndex(i);
-                var visualElement = Resources.Load<VisualTreeAsset>("XML/UIFlow").CloneTree();
+                headerTitle = "Nav Buttons In Menu",
+                showBoundCollectionSize = false,
+                showFoldoutHeader = true,
+                showAlternatingRowBackgrounds = AlternatingRowBackground.All,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+            };
+            navigationList.BindProperty(uiFlowsProp);
+            root.Add(navigationList);
+            #endregion
 
-                var buttonNameLabel = visualElement.Q<Label>("ButtonNameLabel");
-                SerializedProperty buttonProp = uiFlowProp.FindPropertyRelative("Button");
-                buttonNameLabel.text = buttonProp.objectReferenceValue.name;
-
-                var isBackButtonToggle = visualElement.Q<Toggle>("IsBackButton");
-                SerializedProperty isBackButtonProp = uiFlowProp.FindPropertyRelative("IsBackButton");
-                isBackButtonToggle.value = isBackButtonProp.boolValue;
-                var groupGoTo = visualElement.Q<VisualElement>("GroupGoTo");
-                groupGoTo.style.display = isBackButtonToggle.value ? DisplayStyle.None : DisplayStyle.Flex;
-                isBackButtonToggle.RegisterValueChangedCallback(evnt =>
-                {
-                    isBackButtonProp.boolValue = evnt.newValue;
-                    serializedObject.ApplyModifiedProperties();
-
-                    if (evnt.newValue)
-                    {
-                        groupGoTo.style.display = DisplayStyle.None;
-                    }
-                    else
-                    {
-                        groupGoTo.style.display = DisplayStyle.Flex;
-                    }
-                });
-
-                var objectField = visualElement.Q<ObjectField>("TargetMenu");
-                SerializedProperty objectFieldProp = uiFlowProp.FindPropertyRelative("GoTo");
-                objectField.labelElement.style.display = DisplayStyle.None;
-                objectField.objectType = typeof(Menu);
-                objectField.value = objectFieldProp.objectReferenceValue;
-                objectField.BindProperty(objectFieldProp);
-
-                root.Add(visualElement);
-            }
-
-            serializedObject.ApplyModifiedProperties();
             return root;
         }
-    }
 
-    public class XmlComponents
-    {
-        public XmlComponent<DropdownField> DisplayMethodContainer;
-        public Box FadeSection;
-        public Box AnimatorSection;
-
-        public XmlComponents(VisualElement root, Menu target, SerializedObject serializedObject)
+        class DisplayMetohdContainer: VisualElement
         {
-            FadeSection = new Box();
-            FadeSection.Add(new Label("Fade Options"));
-            SerializedProperty scaledTimeProp = serializedObject.FindProperty("scaledTime");
-            SerializedProperty fadeInProp = serializedObject.FindProperty("fadeIn");
-            SerializedProperty fadeOutProp = serializedObject.FindProperty("fadeOut");
-            FadeSection.Add(new PropertyField(scaledTimeProp));
-            FadeSection.Add(new PropertyField(fadeInProp));
-            FadeSection.Add(new PropertyField(fadeOutProp));
-            root.Add(FadeSection);
+            public static readonly string k_displayMethodField = "DisplayMethod";
+            DropdownField displayMethodDropdownField;
 
-            AnimatorSection = new Box();
-            SerializedProperty animatorSettingsProp = serializedObject.FindProperty("animatorSettings");
-            AnimatorSettings animatorSettings = new AnimatorSettings()
+            public static readonly string k_containerGameObjectState = "GameObjectMethod";
+            GameObjectStateMethodContainer gameObjectContainer;
+
+            public static readonly string k_containerCanvasGroupMethod = "CanvasGroupMethod";
+            CanvasGroupMethodContainer canvasGroupMethodContainer;
+
+            public static readonly string k_containerAnimatorMethod = "AnimatorMethod";
+            AnimatorMethodContainer animatorMethodContainer;
+
+            MenuDisplayMethod currentDisplayMethod;
+            VisualElement currentMethodContainer;
+            SerializedObject serializedObject;
+
+            public DisplayMetohdContainer(SerializedObject obj) 
             {
-                ExecuteAnimationOnInit = animatorSettingsProp.FindPropertyRelative("ExecuteAnimationOnInit").boolValue,
-                DefaultState = animatorSettingsProp.FindPropertyRelative("DefaultState").stringValue,
-                HiddenState = animatorSettingsProp.FindPropertyRelative("HiddenState").stringValue,
-                VisibleState = animatorSettingsProp.FindPropertyRelative("VisibleState").stringValue,
-                VisibleParam = animatorSettingsProp.FindPropertyRelative("VisibleParam").stringValue
-            };
-            AnimatorSection.Add(new PropertyField(animatorSettingsProp.FindPropertyRelative("ExecuteAnimationOnInit"), "Play animation on Init"));
-            if (target.Animator.runtimeAnimatorController == null)
-            {
-                AnimatorSection.Add(new Button(() => HandleGenerateAnimatorButtonClick(target.Animator, animatorSettings)) { text = "Generate Animator Controller" });
+                this.serializedObject = obj;
+                MenuDisplayMethod displayMethod = (MenuDisplayMethod) obj.FindProperty("menuDisplayMethod").enumValueFlag;
+                currentDisplayMethod = displayMethod;
+
+                displayMethodDropdownField = new DropdownField("Display Method") { name = k_displayMethodField };
+                Add(displayMethodDropdownField);
+                
+                var values = Enum.GetValues(typeof(MenuDisplayMethod)).Cast<MenuDisplayMethod>();
+                var labels = values.Select(v => GetDescription(v)).ToList();
+                displayMethodDropdownField.choices = labels;
+
+                displayMethodDropdownField.index = (int)displayMethod;
+
+                var displayMethodProp = obj.FindProperty("menuDisplayMethod");
+                displayMethodDropdownField.RegisterValueChangedCallback(e =>
+                {
+                    displayMethodProp.enumValueIndex = displayMethodDropdownField.index;
+                    obj.ApplyModifiedProperties();
+
+                    HandleDisplayMethodChange((MenuDisplayMethod)displayMethodDropdownField.index);
+                });
+
+                currentMethodContainer = HandleDisplayMethodContainer(displayMethod);
+                Add(currentMethodContainer);
             }
-            root.Add(AnimatorSection);
 
-            var values = Enum.GetValues(typeof(MenuDisplayMethod)).Cast<MenuDisplayMethod>();
-            var labels = values.Select(v => GetDescription(v)).ToList();
-            DisplayMethodContainer = new XmlComponent<DropdownField>(root, "DisplayMethodDropdown");
-            DisplayMethodContainer.Component.choices = labels;
-            SerializedProperty menuDisplayMethodProp = serializedObject.FindProperty("menuDisplayMethod");
-            DisplayMethodContainer.Component.index = menuDisplayMethodProp.intValue;
-            HandleDisplayMethodSection((MenuDisplayMethod)DisplayMethodContainer.Component.index);
-            DisplayMethodContainer.Component.RegisterValueChangedCallback(evnt =>
+            void HandleDisplayMethodChange(MenuDisplayMethod displayMethod)
             {
-                menuDisplayMethodProp.enumValueIndex = DisplayMethodContainer.Component.index;
-                serializedObject.ApplyModifiedProperties();
+                if (currentDisplayMethod == displayMethod)
+                    return;
 
-                HandleDisplayMethodSection((MenuDisplayMethod)DisplayMethodContainer.Component.index);
-            });
-        }
+                if (currentMethodContainer != null)
+                    Remove(currentMethodContainer);
 
-        void HandleDisplayMethodSection(MenuDisplayMethod displayMethod)
-        {
-            FadeSection.style.display = DisplayStyle.None;
-            AnimatorSection.style.display = DisplayStyle.None;
+                if (currentDisplayMethod == MenuDisplayMethod.Animator)
+                {
+                    (serializedObject.targetObject as Menu).HandleChangeToAnimatorMode(false);
+                }
 
-            switch (displayMethod)
-            {
-                case MenuDisplayMethod.Fade:
-                    FadeSection.style.display = DisplayStyle.Flex;
-                    break;
+                if (displayMethod == MenuDisplayMethod.Animator)
+                {
+                    (serializedObject.targetObject as Menu).HandleChangeToAnimatorMode(true);
+                }
 
-                case MenuDisplayMethod.Animator:
-                    AnimatorSection.style.display = DisplayStyle.Flex;
-                    break;
+                currentDisplayMethod = displayMethod;
+                currentMethodContainer = HandleDisplayMethodContainer(displayMethod);
+                Add(currentMethodContainer);
             }
-        }
 
-        void HandleGenerateAnimatorButtonClick(Animator animator, AnimatorSettings animatorSettings)
-        {
-            animator.runtimeAnimatorController = CreateAnimatorController(animatorSettings);
-        }
+            VisualElement HandleDisplayMethodContainer(MenuDisplayMethod displayMethod)
+            {
+                switch (displayMethod)
+                {
+                    case MenuDisplayMethod.State:
+                        if (gameObjectContainer == null)
+                            gameObjectContainer = new GameObjectStateMethodContainer(serializedObject);
+                        
+                        return gameObjectContainer;
 
-        AnimatorController CreateAnimatorController(AnimatorSettings animatorSettings)
-        {
-            string animatorPath = EditorUtility.SaveFilePanelInProject(
-                "New animation controller",
-                "MenuAnimatorController",
-                "controller",
-                "Create a new animator controller"
-            );
+                    case MenuDisplayMethod.CanvasGroup:
+                        if (canvasGroupMethodContainer == null)
+                            canvasGroupMethodContainer = new CanvasGroupMethodContainer(serializedObject);
+                        
+                        return canvasGroupMethodContainer;
 
-            if (string.IsNullOrEmpty(animatorPath))
+                    case MenuDisplayMethod.Animator:
+                        if (animatorMethodContainer == null)
+                            animatorMethodContainer = new AnimatorMethodContainer(serializedObject);
+                        
+                        return animatorMethodContainer;
+                }
+
                 return null;
+            }
 
-            AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(animatorPath);
+            class GameObjectStateMethodContainer: VisualElement
+            {
+                public GameObjectStateMethodContainer(SerializedObject obj) { }
+            }
 
-            controller.AddParameter(animatorSettings.VisibleParam, AnimatorControllerParameterType.Bool);
+            class CanvasGroupMethodContainer : VisualElement
+            {
+                public Toggle ScaledTimeToggle { get; private set; }
+                public PropertyField FadeInGroup { get; private set; }
+                public PropertyField FadeOutGroup { get; private set; }
 
-            AnimationClip defaultClip = new AnimationClip() { name = animatorSettings.HiddenState, wrapMode = WrapMode.Once, hideFlags = HideFlags.None };
-            AssetDatabase.AddObjectToAsset(defaultClip, controller);
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(defaultClip));
-            AnimatorState defaultStateHidden = controller.AddMotion(defaultClip);
-            controller.layers[0].stateMachine.AddState(defaultStateHidden, Vector3.one);
-            controller.layers[0].stateMachine.defaultState = defaultStateHidden;
+                public CanvasGroupMethodContainer(SerializedObject obj)
+                {
+                    Add(new Label("Fade Options"));
 
-            AnimationClip visibleClip = new AnimationClip() { name = animatorSettings.VisibleState, wrapMode = WrapMode.Once, hideFlags = HideFlags.None };
-            AssetDatabase.AddObjectToAsset(visibleClip, controller);
-            AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(visibleClip));
-            AnimatorState visibleState = controller.AddMotion(visibleClip);
-            controller.layers[0].stateMachine.AddState(visibleState, Vector3.one + Vector3.right * 20);
+                    SerializedProperty prop = obj.FindProperty("fades");
 
-            AnimatorStateTransition hiddenToVisible = defaultStateHidden.AddTransition(visibleState);
-            hiddenToVisible.hasExitTime = false;
-            hiddenToVisible.exitTime = 0;
-            hiddenToVisible.duration = 0.1f;
-            hiddenToVisible.AddCondition(AnimatorConditionMode.If, 1, animatorSettings.VisibleParam);
+                    SerializedProperty scaledTimeProp = prop.FindPropertyRelative("UseScaledTime");
+                    ScaledTimeToggle = new Toggle("Use Scaled Time");
+                    ScaledTimeToggle.BindProperty(scaledTimeProp);
+                    Add(ScaledTimeToggle);
 
-            AnimatorStateTransition visibleToExit = visibleState.AddExitTransition();
-            visibleToExit.hasExitTime = false;
-            visibleToExit.exitTime = 0;
-            visibleToExit.duration = 0.1f;
-            visibleToExit.AddCondition(AnimatorConditionMode.IfNot, 1, animatorSettings.VisibleParam);
+                    SerializedProperty fadeInProp = prop.FindPropertyRelative("FadeIn");
+                    Add(FadeInGroup = new PropertyField(fadeInProp));
+                    
+                    SerializedProperty fadeOutProp = prop.FindPropertyRelative("FadeOut");
+                    Add(FadeOutGroup = new PropertyField(fadeOutProp));
+                }
+            }
 
-            return controller;
+            class AnimatorMethodContainer: VisualElement
+            {
+                Toggle ScaledTimeToggle;
+                Toggle executeOnInitToggle;
+                Button generateAnimatorButton;
+
+                public AnimatorMethodContainer(SerializedObject obj)
+                {
+                    Add(new Label("Animator Method"));
+
+                    SerializedProperty prop = obj.FindProperty("animatorSettings");
+
+                    SerializedProperty scaledTimeProp = prop.FindPropertyRelative("UseScaledTime");
+                    ScaledTimeToggle = new Toggle("Use Scaled Time");
+                    ScaledTimeToggle.BindProperty(scaledTimeProp);
+                    Add(ScaledTimeToggle);
+
+                    executeOnInitToggle = new Toggle("Execute on Init");
+                    executeOnInitToggle.BindProperty(prop.FindPropertyRelative("ExecuteAnimationOnInit"));
+                    Add(executeOnInitToggle);
+
+                    generateAnimatorButton = new Button() { text = "Create Animator Controller" };
+                    generateAnimatorButton.RegisterCallback<ClickEvent>(e =>
+                    {
+                        var targetObject = obj.targetObject as Menu;
+                        var animatorSettings = obj.FindProperty("animatorSettings");
+                        
+                        var created = AnimatorControllerTemplate();
+                        if (created != null)
+                        {
+                            targetObject.Animator.runtimeAnimatorController = created;
+                        }
+                    });
+                    Add(generateAnimatorButton);
+                }
+
+                AnimatorController AnimatorControllerTemplate()
+                {
+                    string animatorPath = EditorUtility.SaveFilePanelInProject(
+                        "New animation controller",
+                        "MenuAnimatorController",
+                        "controller",
+                        "Create a new animator controller"
+                    );
+
+                    if (string.IsNullOrEmpty(animatorPath))
+                        return null;
+
+                    AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(animatorPath);
+
+                    controller.AddParameter(AnimatorSettings.VisibleParam, AnimatorControllerParameterType.Bool);
+
+                    AnimationClip defaultClip = new AnimationClip() { name = AnimatorSettings.HiddenState, wrapMode = WrapMode.Once, hideFlags = HideFlags.None };
+                    AssetDatabase.AddObjectToAsset(defaultClip, controller);
+                    AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(defaultClip));
+                    AnimatorState defaultStateHidden = controller.AddMotion(defaultClip);
+                    controller.layers[0].stateMachine.AddState(defaultStateHidden, Vector3.one);
+                    controller.layers[0].stateMachine.defaultState = defaultStateHidden;
+
+                    AnimationClip visibleClip = new AnimationClip() { name = AnimatorSettings.VisibleState, wrapMode = WrapMode.Once, hideFlags = HideFlags.None };
+                    AssetDatabase.AddObjectToAsset(visibleClip, controller);
+                    AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(visibleClip));
+                    AnimatorState visibleState = controller.AddMotion(visibleClip);
+                    controller.layers[0].stateMachine.AddState(visibleState, Vector3.one + Vector3.right * 20);
+
+                    AnimatorStateTransition hiddenToVisible = defaultStateHidden.AddTransition(visibleState);
+                    hiddenToVisible.hasExitTime = false;
+                    hiddenToVisible.exitTime = 0;
+                    hiddenToVisible.duration = 0.1f;
+                    hiddenToVisible.AddCondition(AnimatorConditionMode.If, 1, AnimatorSettings.VisibleParam);
+
+                    AnimatorStateTransition visibleToExit = visibleState.AddExitTransition();
+                    visibleToExit.hasExitTime = false;
+                    visibleToExit.exitTime = 0;
+                    visibleToExit.duration = 0.1f;
+                    visibleToExit.AddCondition(AnimatorConditionMode.IfNot, 1, AnimatorSettings.VisibleParam);
+
+                    return controller;
+                }
+            }
         }
 
-        string GetDescription(Enum value)
+        static string GetDescription(Enum value)
         {
             var field = value.GetType().GetField(value.ToString());
             var attr = (DescriptionAttribute[])field.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attr.Length > 0 ? attr[0].Description : value.ToString();
-        }
-    }
-
-    public class XmlComponent<T> where T : VisualElement
-    {
-        string id;
-        public T Component;
-
-        public XmlComponent(VisualElement root, string id)
-        {
-            this.id = id;
-            Component = root.Q<T>(id);
         }
     }
 }

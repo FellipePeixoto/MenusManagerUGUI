@@ -1,3 +1,6 @@
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -5,27 +8,32 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using static Codice.Utils.Buffers.SizeBufferPool;
+using static UnityEditor.Experimental.GraphView.GraphView;
+using static DevPeixoto.UI.MenuManager.UGUI.ButtonMenuNav;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
-    [System.Serializable]
     [AddComponentMenu("DevPeixoto/UI/Menu Manager/Menu")]
-    [RequireComponent(typeof(CanvasGroup), typeof(Animator))]
+    [RequireComponent(typeof(CanvasGroup))]
     public class Menu : MonoBehaviour
     {
-        [Header("Event System")]
+        [SerializeField, HideInInspector] internal MenusManager owner;
+
         public GameObject firstSelected;
-        [SerializeField] bool keepOnBackground = false;
-        [SerializeField] bool scaledTime = false;
-        [SerializeField] AnimatorSettings animatorSettings = new AnimatorSettings();
+
         [SerializeField] MenuDisplayMethod menuDisplayMethod;
-        [SerializeField] Fade fadeIn;
-        [SerializeField] Fade fadeOut;
-        [SerializeField] List<UiFlow> uiFlows = new List<UiFlow>();
-        public MenusManager parentMenusManager;
+
+        [SerializeField] AnimatorSettings animatorSettings = new AnimatorSettings();
+
+        [SerializeField] Fades fades = new Fades();
+
+        [SerializeField] List<NavContainer> navButtons = new List<NavContainer>();
+        
         public UnityEvent onInit;
+        public UnityEvent onBeforeShow;
         public UnityEvent onShow;
+        public UnityEvent onBeforeHide;
         public UnityEvent onHide;
 
         CanvasGroup canvasGroup;
@@ -43,7 +51,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
         Animator animator;
-        public Animator Animator
+        internal Animator Animator
         {
             get
             {
@@ -57,8 +65,14 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
         int sibblingIndex;
+        internal Transform backgroundParent;
+        Coroutine fadeCoroutine;
 
-        public void Init(MenusManager respectiveMenusManager, bool visible)
+#if UNITY_EDITOR
+        RuntimeAnimatorController lastController;
+#endif
+
+        internal void Init(bool visible)
         {
             sibblingIndex = transform.GetSiblingIndex();
 
@@ -69,34 +83,39 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.CanvasGroup:
-                case MenuDisplayMethod.Fade:
                     CanvasGroup.alpha = visible ? 1 : 0;
-                    CanvasGroup.blocksRaycasts = visible;
-                    CanvasGroup.interactable = visible;
+                    HandleCanvasGroupInteraction(visible);
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.Play(
-                        visible ? animatorSettings.VisibleState : animatorSettings.DefaultState, 
-                        0,
-                        animatorSettings.ExecuteAnimationOnInit ? 0 : 1);
-                    Animator.SetBool(animatorSettings.VisibleParam, visible);
-                    HandleCanvasGroupOnAnimatorMode(visible);
+                    if (Animator == null)
+                    {
+                        Debug.LogError("No Animator Component");
+                        break;
+                    }
+                    Animator.SetBool(AnimatorSettings.VisibleParam, visible);
+                    if (!animatorSettings.ExecuteAnimationOnInit)
+                    {
+                        Animator.Play(visible ? AnimatorSettings.VisibleState : AnimatorSettings.DefaultState);
+                    }
+                    HandleCanvasGroupInteraction(visible);
                     break;
             }
 
-            parentMenusManager = respectiveMenusManager;
-            SetFlows();
+            SetupNavButtons();
+            var buttonBack = GetComponent<ButtonMenuBack>();
+            if (buttonBack != null)
+                buttonBack.owner = owner;
+
             onInit?.Invoke();
         }
 
-        public void Show(bool notify = true, Transform parent = null)
+        internal void Show(bool notify = true)
         {
-            if (keepOnBackground)
-            {
-                transform.SetParent(parent);
-                transform.SetSiblingIndex(sibblingIndex);
-            }
+            if (notify)
+                onBeforeShow?.Invoke();
+
+            HandleReturnToDefaultParent();
 
             switch (menuDisplayMethod)
             {
@@ -105,18 +124,27 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     break;
 
                 case MenuDisplayMethod.CanvasGroup:
-                    CanvasGroup.alpha = 1;
-                    CanvasGroup.interactable = true;
-                    CanvasGroup.blocksRaycasts = true;
-                    break;
-
-                case MenuDisplayMethod.Fade:
-                    StartCoroutine(CanvasGroupFadeIn());
+                    if (fades.FadeIn.Duration > 0)
+                    {
+                        if (fadeCoroutine != null)
+                            StopCoroutine(fadeCoroutine);
+                        fadeCoroutine = StartCoroutine(CanvasGroupFade());
+                    }
+                    else
+                    {
+                        CanvasGroup.alpha = 1;
+                        HandleCanvasGroupInteraction(true);
+                    }
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.SetBool(animatorSettings.VisibleParam, true);
-                    HandleCanvasGroupOnAnimatorMode(true);
+                    if (Animator == null)
+                    {
+                        Debug.LogError("No Animator Component");
+                        break;
+                    }
+                    Animator.SetBool(AnimatorSettings.VisibleParam, true);
+                    HandleCanvasGroupInteraction(true);
                     break;
             }
 
@@ -126,35 +154,39 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 onShow?.Invoke();
         }
 
-        public void Hide(bool notify = true, Transform parent = null)
+        internal void Hide(bool notify = true)
         {
-            if (keepOnBackground)
-                transform.SetParent(parent);
+            if (notify)
+                onBeforeHide?.Invoke();
 
             switch (menuDisplayMethod)
             {
                 case MenuDisplayMethod.State:
-                    if (!keepOnBackground)
-                        gameObject.SetActive(false);
+                    gameObject.SetActive(false);
                     break;
 
                 case MenuDisplayMethod.CanvasGroup:
-                    if (!keepOnBackground)
+                    if (fades.FadeOut.Duration > 0)
+                    {
+                        if (fadeCoroutine != null)
+                            StopCoroutine(fadeCoroutine);
+                        fadeCoroutine = StartCoroutine(CanvasGroupFadeOut());
+                    }
+                    else
                     {
                         CanvasGroup.alpha = 0;
+                        HandleCanvasGroupInteraction(false);
                     }
-                    CanvasGroup.interactable = false;
-                    CanvasGroup.blocksRaycasts = false;
-                    break;
-
-                case MenuDisplayMethod.Fade:
-                    if (!keepOnBackground)
-                        StartCoroutine(CanvasGroupFadeOut());
                     break;
 
                 case MenuDisplayMethod.Animator:
-                    Animator.SetBool(animatorSettings.VisibleParam, false);
-                    HandleCanvasGroupOnAnimatorMode(false);
+                    if (Animator == null)
+                    {
+                        Debug.LogError("No Animator Component");
+                        break;
+                    }
+                    Animator.SetBool(AnimatorSettings.VisibleParam, false);
+                    HandleCanvasGroupInteraction(false);
                     break;
             }
 
@@ -162,56 +194,71 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 onHide?.Invoke();
         }
 
-        IEnumerator CanvasGroupFadeIn()
+        void HandleReturnToDefaultParent()
         {
-            if (scaledTime)
-                yield return new WaitForSeconds(fadeIn.Delay);
+            if (transform.parent == backgroundParent)
+            {
+                transform.SetParent(owner.transform);
+                transform.SetSiblingIndex(sibblingIndex);
+            }
+        }
+
+        IEnumerator CanvasGroupFade()
+        {
+            Fades.Fade fade = fades.FadeOut;
+
+            HandleCanvasGroupInteraction(true);
+
+            if (animatorSettings.UseScaledTime)
+                yield return new WaitForSeconds(fade.Delay);
             else
-                yield return new WaitForSecondsRealtime(fadeIn.Delay);
+                yield return new WaitForSecondsRealtime(fade.Delay);
 
             float timer = 0;
-            CanvasGroup.alpha = 0;
 
-            if (scaledTime)
+            if (fades.UseScaledTime)
             {
-                while (timer < fadeIn.Duration)
+                while (timer < fade.Duration)
                 {
                     timer += Time.deltaTime;
-                    CanvasGroup.alpha = fadeIn.Curve.Evaluate(timer / fadeIn.Duration);
+                    CanvasGroup.alpha = fade.Curve.Evaluate(Mathf.Abs(timer / fade.Duration));
                     yield return null;
                 }
             }
             else
             {
-                while (timer < fadeIn.Duration)
+                while (timer < fade.Duration)
                 {
                     timer += Time.unscaledDeltaTime;
-                    CanvasGroup.alpha = fadeIn.Curve.Evaluate(timer / fadeIn.Duration);
+                    CanvasGroup.alpha = fade.Curve.Evaluate(Mathf.Abs(timer / fade.Duration));
                     yield return null;
                 }
             }
 
             CanvasGroup.alpha = 1;
-            CanvasGroup.interactable = true;
-            CanvasGroup.blocksRaycasts = true;
+
+            fadeCoroutine = null;
         }
 
         IEnumerator CanvasGroupFadeOut()
         {
-            if (scaledTime)
-                yield return new WaitForSeconds(fadeOut.Delay);
+            Fades.Fade fadeInfo = fades.FadeOut;
+
+            HandleCanvasGroupInteraction(false);
+
+            if (animatorSettings.UseScaledTime)
+                yield return new WaitForSeconds(fadeInfo.Delay);
             else
-                yield return new WaitForSecondsRealtime(fadeOut.Delay);
+                yield return new WaitForSecondsRealtime(fadeInfo.Delay);
 
-            float timer = fadeOut.Duration;
-            CanvasGroup.alpha = 1;
+            float timer = fadeInfo.Duration;
 
-            if (scaledTime)
+            if (fades.UseScaledTime)
             {
                 while (timer > 0)
                 {
                     timer -= Time.deltaTime;
-                    CanvasGroup.alpha = fadeOut.Curve.Evaluate(timer / fadeOut.Duration);
+                    CanvasGroup.alpha = fadeInfo.Curve.Evaluate(timer / fadeInfo.Duration);
                     yield return null;
                 }
             }
@@ -220,102 +267,117 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 while (timer > 0)
                 {
                     timer -= Time.unscaledDeltaTime;
-                    CanvasGroup.alpha = fadeOut.Curve.Evaluate(timer / fadeOut.Duration);
+                    CanvasGroup.alpha = fadeInfo.Curve.Evaluate(timer / fadeInfo.Duration);
                     yield return null;
                 }
             }
 
             CanvasGroup.alpha = 0;
-            CanvasGroup.interactable = false;
-            CanvasGroup.blocksRaycasts = false;
+
+            fadeCoroutine = null;
         }
 
-        public void LoadUiFlow()
-        {
-            var allButtons = GetComponentsInChildren<Button>();
-
-            if (uiFlows == null)
-            {
-                uiFlows = new();
-                foreach (var button in allButtons)
-                {
-                    uiFlows.Add(new UiFlow() { Button = button, GoTo = null });
-                }
-            }
-            else
-            {
-                var nonSetButtons = allButtons.Where(x => !uiFlows.Select(y => y.Button).Contains(x)).ToList();
-                foreach (var button in nonSetButtons)
-                {
-                    uiFlows.Add(new UiFlow()
-                    {
-                        Button = button,
-                        GoTo = null
-                    });
-                }
-            }
-        }
-
-        void HandleCanvasGroupOnAnimatorMode(bool visible)
+        void HandleCanvasGroupInteraction(bool visible)
         {
             CanvasGroup.blocksRaycasts = visible;
             CanvasGroup.interactable = visible;
         }
 
-#if UNITY_EDITOR
-        private void OnValidate()
+        void SetupNavButtons()
         {
-            SetFlows();
+            if (this == null)
+                return;
+
+            navButtons = GetComponentsInChildren<ButtonMenuNav>(true).ToList().Select(x => x.navContainer).ToList();
+            foreach (var button in navButtons)
+                button.owner = owner;
         }
-#endif
 
-        void SetFlows()
+#if UNITY_EDITOR
+        private void DelayCall()
         {
-            foreach (var uiflow in uiFlows)
+            if (this == null)
+                return;
+
+            SetupNavButtons();
+        }
+
+        void HierarchyChanged()
+        {
+            if (this == null)
+                return;
+
+            SetupNavButtons();
+        }
+
+        internal void HandleChangeToAnimatorMode(bool animatorMode)
+        {
+            if (animatorMode)
             {
-
-                uiflow.Button.onClick.RemoveAllListeners();
-                uiflow.Button.onClick.AddListener(() =>
+                if (Animator == null)
                 {
-                    if (parentMenusManager == null)
-                    {
-                        Debug.LogError("This Menu doens't have any Manager associated. Did you set the manager to manually set the the menus?");
-                        return;
-                    }
-
-                    if (uiflow.IsBackButton)
-                        parentMenusManager.Back();
-                    else if (uiflow.GoTo != null)
-                        parentMenusManager.SwitchTo(uiflow.GoTo);
-                });
+                    gameObject.AddComponent<Animator>();
+                    Animator.runtimeAnimatorController = lastController;
+                }
+            }
+            else
+            {
+                if (Animator != null)
+                {
+                    lastController = Animator.runtimeAnimatorController;
+                    DestroyImmediate(Animator);
+                }
             }
         }
+
+        [InitializeOnLoadMethod]
+        static void OnUnityReload()
+        {
+            var allMenus = FindObjectsByType<Menu>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var item in allMenus)
+            {
+                EditorApplication.delayCall += item.DelayCall;
+                EditorApplication.hierarchyChanged += item.HierarchyChanged;
+            }
+        }
+
+        private void OnValidate()
+        {
+            SetupNavButtons();
+        }
+
+        private void Reset()
+        {
+            SetupNavButtons();
+        }
+#endif
     }
 
     [System.Serializable]
-    public class Fade
+    public class Fades
     {
-        public float Delay;
-        public float Duration = 0.35f;
-        public AnimationCurve Curve = AnimationCurve.Linear(0, 0, 1, 1);
-    }
+        public bool UseScaledTime;
+        public Fade FadeIn;
+        public  Fade FadeOut;
 
-    [System.Serializable]
-    public class UiFlow
-    {
-        public bool IsBackButton;
-        public Button Button;
-        public Menu GoTo;
-    }
+        [System.Serializable]
+        public class Fade
+        {
+            public float Delay;
+            public float Duration = 0f;
+            public AnimationCurve Curve = AnimationCurve.Linear(0, 0, 1, 1);
+        }
+    }    
 
     [System.Serializable]
     public class AnimatorSettings
     {
         public bool ExecuteAnimationOnInit;
-        [HideInInspector] public string DefaultState = "MenuHidden";
-        [HideInInspector] public string HiddenState = "MenuHidden";
-        [HideInInspector] public string VisibleState = "MenuVisible";
-        [HideInInspector] public string VisibleParam = "visible";
+        public bool UseScaledTime;
+        public static readonly string DefaultState = "MenuHidden";
+        public static readonly string HiddenState = "MenuHidden";
+        public static readonly string VisibleState = "MenuVisible";
+        public static readonly string VisibleParam = "visible";
     }
 
     public enum MenuDisplayMethod
@@ -324,9 +386,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         State = 0,
         [Description("Control with Canvas Group")]
         CanvasGroup = 1,
-        [Description("Fade In and Out")]
-        Fade = 2,
         [Description("Contro with Animator")]
-        Animator = 3,
+        Animator = 2,
     }
 }

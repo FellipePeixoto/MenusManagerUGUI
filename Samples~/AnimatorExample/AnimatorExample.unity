@@ -437,8 +437,8 @@ GameObject:
   m_Component:
   - component: {fileID: 580569460}
   - component: {fileID: 580569463}
-  - component: {fileID: 580569462}
   - component: {fileID: 580569461}
+  - component: {fileID: 580569464}
   m_Layer: 5
   m_Name: MenuA
   m_TagString: Untagged
@@ -479,88 +479,105 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b6bd63aee97874c8fdd26c63855182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
   firstSelected: {fileID: 0}
-  keepOnBackground: 1
-  scaledTime: 0
+  menuDisplayMethod: 2
   animatorSettings:
-    InteractionOnlyWhenVisible: 1
-    DefaultState: MenuHidden
-    HiddenState: MenuHidden
-    VisibleState: MenuVisible
-    VisibleParam: visible
-  menuDisplayMethod: 3
-  fadeIn:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  fadeOut:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  uiFlows:
-  - IsBackButton: 0
-    Button: {fileID: 1222829955}
-    GoTo: {fileID: 1669157191}
-  - IsBackButton: 0
-    Button: {fileID: 1802615341}
-    GoTo: {fileID: 1664920267}
-  parentMenusManager: {fileID: 0}
+    ExecuteAnimationOnInit: 0
+    UseScaledTime: 0
+  fades:
+    UseScaledTime: 0
+    FadeIn:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    FadeOut:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  navButtons:
+  - selfRef: {fileID: 1222829958}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuB
+    Overlay: 0
+  - selfRef: {fileID: 1802615344}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuC
+    Overlay: 0
   onInit:
+    m_PersistentCalls:
+      m_Calls: []
+  onBeforeShow:
     m_PersistentCalls:
       m_Calls: []
   onShow:
     m_PersistentCalls:
       m_Calls: []
+  onBeforeHide:
+    m_PersistentCalls:
+      m_Calls: []
   onHide:
     m_PersistentCalls:
       m_Calls: []
---- !u!95 &580569462
+--- !u!225 &580569463
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580569459}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!95 &580569464
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -582,18 +599,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!225 &580569463
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 580569459}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &736155148
 GameObject:
   m_ObjectHideFlags: 0
@@ -1058,7 +1063,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 64.3341}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1222829955
 MonoBehaviour:
@@ -1142,28 +1147,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1222829953}
   m_CullTransparentMesh: 1
---- !u!95 &1222829958
-Animator:
-  serializedVersion: 7
+--- !u!114 &1222829958
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1222829953}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: d17832f0c930f7a438761a3a81f140db, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db64f0416798cc34692cc9f97a4efbdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navContainer:
+    selfRef: {fileID: 1222829958}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuB
+    Overlay: 0
 --- !u!1 &1243265849
 GameObject:
   m_ObjectHideFlags: 0
@@ -1543,14 +1543,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d1d9c7d7f4b03549b50abd7a67f00c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstSiblingIsTheDefault: 1
-  defaultMenu: {fileID: 0}
+  firstSiblingIsTheDefault: 0
+  defaultMenu: {fileID: 580569461}
   nonRepeatedNav: 0
   getMenusInChildren: 0
   menus:
   - {fileID: 580569461}
   - {fileID: 1669157191}
   - {fileID: 1664920267}
+  menusNames:
+  - None
+  - None
+  - None
+  - None
+  - MenuA
+  - MenuB
+  - MenuC
   onReachedLastMenu:
     m_PersistentCalls:
       m_Calls: []
@@ -1606,76 +1614,79 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b6bd63aee97874c8fdd26c63855182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
   firstSelected: {fileID: 0}
-  keepOnBackground: 0
-  scaledTime: 0
+  menuDisplayMethod: 2
   animatorSettings:
-    InteractionOnlyWhenVisible: 1
-    DefaultState: MenuHidden
-    HiddenState: MenuHidden
-    VisibleState: MenuVisible
-    VisibleParam: visible
-  menuDisplayMethod: 3
-  fadeIn:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  fadeOut:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  uiFlows: []
-  parentMenusManager: {fileID: 0}
+    ExecuteAnimationOnInit: 0
+    UseScaledTime: 0
+  fades:
+    UseScaledTime: 0
+    FadeIn:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    FadeOut:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  navButtons: []
   onInit:
     m_PersistentCalls:
       m_Calls: []
+  onBeforeShow:
+    m_PersistentCalls:
+      m_Calls: []
   onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onBeforeHide:
     m_PersistentCalls:
       m_Calls: []
   onHide:
@@ -1767,76 +1778,79 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b6bd63aee97874c8fdd26c63855182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
   firstSelected: {fileID: 0}
-  keepOnBackground: 0
-  scaledTime: 0
+  menuDisplayMethod: 2
   animatorSettings:
-    InteractionOnlyWhenVisible: 1
-    DefaultState: MenuHidden
-    HiddenState: MenuHidden
-    VisibleState: MenuVisible
-    VisibleParam: visible
-  menuDisplayMethod: 3
-  fadeIn:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  fadeOut:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  uiFlows: []
-  parentMenusManager: {fileID: 0}
+    ExecuteAnimationOnInit: 0
+    UseScaledTime: 0
+  fades:
+    UseScaledTime: 0
+    FadeIn:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    FadeOut:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  navButtons: []
   onInit:
     m_PersistentCalls:
       m_Calls: []
+  onBeforeShow:
+    m_PersistentCalls:
+      m_Calls: []
   onShow:
+    m_PersistentCalls:
+      m_Calls: []
+  onBeforeHide:
     m_PersistentCalls:
       m_Calls: []
   onHide:
@@ -1888,6 +1902,7 @@ GameObject:
   - component: {fileID: 1802615343}
   - component: {fileID: 1802615342}
   - component: {fileID: 1802615341}
+  - component: {fileID: 1802615344}
   m_Layer: 5
   m_Name: ButtonMenuC
   m_TagString: Untagged
@@ -1913,7 +1928,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 64.3341}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1802615341
 MonoBehaviour:
@@ -1997,6 +2012,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1802615339}
   m_CullTransparentMesh: 1
+--- !u!114 &1802615344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802615339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db64f0416798cc34692cc9f97a4efbdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  navContainer:
+    selfRef: {fileID: 1802615344}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuC
+    Overlay: 0
 --- !u!1 &2122340558
 GameObject:
   m_ObjectHideFlags: 0
@@ -2057,7 +2089,7 @@ MonoBehaviour:
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
+  m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
