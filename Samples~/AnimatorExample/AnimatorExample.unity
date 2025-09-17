@@ -437,8 +437,8 @@ GameObject:
   m_Component:
   - component: {fileID: 580569460}
   - component: {fileID: 580569463}
-  - component: {fileID: 580569462}
   - component: {fileID: 580569461}
+  - component: {fileID: 580569464}
   m_Layer: 5
   m_Name: MenuA
   m_TagString: Untagged
@@ -479,74 +479,77 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b6bd63aee97874c8fdd26c63855182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
   firstSelected: {fileID: 0}
-  keepOnBackground: 0
-  scaledTime: 0
+  menuDisplayMethod: 2
   animatorSettings:
     ExecuteAnimationOnInit: 0
-    DefaultState: MenuHidden
-    HiddenState: MenuHidden
-    VisibleState: MenuVisible
-    VisibleParam: visible
-  menuDisplayMethod: 0
-  fadeIn:
-    Delay: 0
-    Duration: 0
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  fadeOut:
-    Delay: 0
-    Duration: 0
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
+    UseScaledTime: 0
+  fades:
+    UseScaledTime: 0
+    FadeIn:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    FadeOut:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
   navButtons:
-  - {fileID: 1222829958}
-  - {fileID: 1802615344}
-  owner: {fileID: 1503351613}
+  - selfRef: {fileID: 1222829958}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuB
+    Overlay: 0
+  - selfRef: {fileID: 1802615344}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuC
+    Overlay: 0
   onInit:
     m_PersistentCalls:
       m_Calls: []
@@ -562,7 +565,19 @@ MonoBehaviour:
   onHide:
     m_PersistentCalls:
       m_Calls: []
---- !u!95 &580569462
+--- !u!225 &580569463
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580569459}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!95 &580569464
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -584,18 +599,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!225 &580569463
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 580569459}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &736155148
 GameObject:
   m_ObjectHideFlags: 0
@@ -1156,8 +1159,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db64f0416798cc34692cc9f97a4efbdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  owner: {fileID: 1503351613}
-  targetMenu: MenuB
+  navContainer:
+    selfRef: {fileID: 1222829958}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuB
+    Overlay: 0
 --- !u!1 &1243265849
 GameObject:
   m_ObjectHideFlags: 0
@@ -1550,14 +1556,6 @@ MonoBehaviour:
   - None
   - None
   - None
-  - None
-  - None
-  - None
-  - None
-  - None
-  - None
-  - None
-  - None
   - MenuA
   - MenuB
   - MenuC
@@ -1616,72 +1614,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b6bd63aee97874c8fdd26c63855182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
   firstSelected: {fileID: 0}
-  keepOnBackground: 0
-  scaledTime: 0
+  menuDisplayMethod: 2
   animatorSettings:
     ExecuteAnimationOnInit: 0
-    DefaultState: MenuHidden
-    HiddenState: MenuHidden
-    VisibleState: MenuVisible
-    VisibleParam: visible
-  menuDisplayMethod: 3
-  fadeIn:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  fadeOut:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
+    UseScaledTime: 0
+  fades:
+    UseScaledTime: 0
+    FadeIn:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    FadeOut:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
   navButtons: []
-  owner: {fileID: 1503351613}
   onInit:
     m_PersistentCalls:
       m_Calls: []
@@ -1783,72 +1778,69 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31b6bd63aee97874c8fdd26c63855182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 1503351613}
   firstSelected: {fileID: 0}
-  keepOnBackground: 0
-  scaledTime: 0
+  menuDisplayMethod: 2
   animatorSettings:
     ExecuteAnimationOnInit: 0
-    DefaultState: MenuHidden
-    HiddenState: MenuHidden
-    VisibleState: MenuVisible
-    VisibleParam: visible
-  menuDisplayMethod: 3
-  fadeIn:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  fadeOut:
-    Delay: 0
-    Duration: 0.35
-    Curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
+    UseScaledTime: 0
+  fades:
+    UseScaledTime: 0
+    FadeIn:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    FadeOut:
+      Delay: 0
+      Duration: 0
+      Curve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
   navButtons: []
-  owner: {fileID: 1503351613}
   onInit:
     m_PersistentCalls:
       m_Calls: []
@@ -2032,8 +2024,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db64f0416798cc34692cc9f97a4efbdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  owner: {fileID: 1503351613}
-  targetMenu: MenuC
+  navContainer:
+    selfRef: {fileID: 1802615344}
+    owner: {fileID: 1503351613}
+    targetMenu: MenuC
+    Overlay: 0
 --- !u!1 &2122340558
 GameObject:
   m_ObjectHideFlags: 0

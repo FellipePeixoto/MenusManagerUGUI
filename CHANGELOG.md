@@ -30,6 +30,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Animator display mode interfering with other display methods
 
+## [1.3.0] - 2025-09-17
+
+### Added
+- Add a dropdown to list the menus available from the current menu
+- Merge Canvas Group Method with Fade method
+- Include OnBeforeShow, OnShow, OnBeforeHide, OnHide
+
+### Changed
+- Great Refactor
+- SwitchTo renamed to Open
+- Replaced the Keep On Background option OpenOverlay. Function passed to the Menu Manager
+- Add of internals to keep the flow clean
+- Add scaled time for CanvasGroup and Animator modes only
+- Grouped Fades
+
+### Deprecated
+- UIFlow container
+
+### Removed
+- XML: Inspector UI made by code only
+
+### Fixed
+- Animator display mode interfering with other display methods
+
 ## [1.2.0] - 2025-09-10
 
 ### Added
