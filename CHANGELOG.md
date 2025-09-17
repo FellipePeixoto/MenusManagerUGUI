@@ -21,7 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing
 
 ### Fixed
-- Null reference on add Button Nav or Back Buton
+- ExecuteAnimationOnInit was doing nothing. Rewind to the conditional normalized time of Animator
+
+## [1.3.2] - 2025-09-17
+
+### Fixed
+- ExecuteAnimationOnInit was doing nothing. Rewind to the conditional normalized time of Animator
 
 ## [1.3.1] - 2025-09-17
 

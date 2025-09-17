@@ -37,7 +37,7 @@ Add this git url as package: <pre>```https://github.com/FellipePeixoto/MenusMana
 
 ## Limitations
 
-- 
+- Animator ins't setup to work with the unscaled time yet
 
 ## Known Issues
 

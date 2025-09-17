@@ -96,7 +96,10 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     Animator.SetBool(AnimatorSettings.VisibleParam, visible);
                     if (!animatorSettings.ExecuteAnimationOnInit)
                     {
-                        Animator.Play(visible ? AnimatorSettings.VisibleState : AnimatorSettings.DefaultState);
+                        Animator.Play(
+                        visible ? AnimatorSettings.VisibleState : AnimatorSettings.DefaultState,
+                        0,
+                        animatorSettings.ExecuteAnimationOnInit ? 0 : 1);
                     }
                     HandleCanvasGroupInteraction(visible);
                     break;
