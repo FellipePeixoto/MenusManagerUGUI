@@ -21,7 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing
 
 ### Fixed
-- ExecuteAnimationOnInit was doing nothing. Rewind to the conditional normalized time of Animator
+- Show as overlay wasn't disabling interaction
+
+## [1.3.3] - 2025-09-19
+
+### Fixed
+- Show as overlay wasn't disabling interaction
 
 ## [1.3.2] - 2025-09-17
 

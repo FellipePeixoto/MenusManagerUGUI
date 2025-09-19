@@ -127,6 +127,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             }
 
             peek.transform.SetParent(backgroundMenusParent);
+            peek.HandleCanvasGroupInteraction(false);
+
             menu.Show();
 
             currentMenuList.Add(menu);

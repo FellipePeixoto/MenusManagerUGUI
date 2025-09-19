@@ -280,10 +280,10 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             fadeCoroutine = null;
         }
 
-        void HandleCanvasGroupInteraction(bool visible)
+        internal void HandleCanvasGroupInteraction(bool interactive)
         {
-            CanvasGroup.blocksRaycasts = visible;
-            CanvasGroup.interactable = visible;
+            CanvasGroup.blocksRaycasts = interactive;
+            CanvasGroup.interactable = interactive;
         }
 
         void SetupNavButtons()
