@@ -8,8 +8,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using static Codice.Utils.Buffers.SizeBufferPool;
-using static UnityEditor.Experimental.GraphView.GraphView;
 using static DevPeixoto.UI.MenuManager.UGUI.ButtonMenuNav;
 
 namespace DevPeixoto.UI.MenuManager.UGUI

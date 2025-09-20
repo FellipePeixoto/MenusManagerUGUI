@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
-using static UnityEditor.U2D.ScriptablePacker;
 
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
@@ -12,7 +11,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     {
         [SerializeField] bool firstSiblingIsTheDefault;
         [SerializeField] Menu defaultMenu;
-        [SerializeField] bool nonRepeatedNav;
+        [SerializeField] public bool nonRepeatedNav;
         [SerializeField] bool getMenusInChildren;
         [SerializeField] List<Menu> menus = new();
         [SerializeField, HideInInspector] internal List<string> menusNames = new ();

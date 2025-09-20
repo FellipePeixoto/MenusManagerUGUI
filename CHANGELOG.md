@@ -21,7 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing
 
 ### Fixed
-- Show as overlay wasn't disabling interaction
+- Missing dependent compilation
+
+## [1.3.4] - 2025-09-20
+
+### Fixed
+- Missing dependent compilation
 
 ## [1.3.3] - 2025-09-19
 
