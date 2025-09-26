@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -11,6 +13,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
     {
         [SerializeField] bool firstSiblingIsTheDefault;
         [SerializeField] Menu defaultMenu;
+        [SerializeField] bool handleOperationsNextFrame;
         [SerializeField] public bool nonRepeatedNav;
         [SerializeField] bool getMenusInChildren;
         [SerializeField] List<Menu> menus = new();
@@ -83,17 +86,37 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             if (Peek() == menu)
                 return;
 
-            if (nonRepeatedNav && currentMenuList.Contains(menu))
+            if (handleOperationsNextFrame)
             {
-                ReInsert(menu);
-                return;
+                StartCoroutine(HandleActionNextFrame(() =>
+                {
+                    if (nonRepeatedNav && currentMenuList.Contains(menu))
+                    {
+                        ReInsert(menu);
+                        return;
+                    }
+
+                    Peek().Hide();
+
+                    menu.Show();
+
+                    currentMenuList.Add(menu);
+                }));
             }
+            else
+            {
+                if (nonRepeatedNav && currentMenuList.Contains(menu))
+                {
+                    ReInsert(menu);
+                    return;
+                }
 
-            Peek().Hide();
+                Peek().Hide();
 
-            menu.Show();
+                menu.Show();
 
-            currentMenuList.Add(menu);
+                currentMenuList.Add(menu);
+            }
         }
 
         public void Open(string menuName)
@@ -119,18 +142,39 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             if (peek == menu)
                 return;
 
-            if (nonRepeatedNav && currentMenuList.Contains(menu))
+            if (handleOperationsNextFrame)
             {
-                ReInsert(menu);
-                return;
+                StartCoroutine(HandleActionNextFrame(() =>
+                {
+                    if (nonRepeatedNav && currentMenuList.Contains(menu))
+                    {
+                        ReInsert(menu);
+                        return;
+                    }
+
+                    peek.transform.SetParent(backgroundMenusParent);
+                    peek.HandleCanvasGroupInteraction(false);
+
+                    menu.Show();
+
+                    currentMenuList.Add(menu);
+                }));
             }
+            else
+            {
+                if (nonRepeatedNav && currentMenuList.Contains(menu))
+                {
+                    ReInsert(menu);
+                    return;
+                }
 
-            peek.transform.SetParent(backgroundMenusParent);
-            peek.HandleCanvasGroupInteraction(false);
+                peek.transform.SetParent(backgroundMenusParent);
+                peek.HandleCanvasGroupInteraction(false);
 
-            menu.Show();
+                menu.Show();
 
-            currentMenuList.Add(menu);
+                currentMenuList.Add(menu);
+            }
         }
 
         public void OpenOverlay(string menuName)
@@ -149,11 +193,31 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 return;
             }
 
-            var pop = Pop();
-            pop.Hide();
+            if (handleOperationsNextFrame)
+            {
+                StartCoroutine(HandleActionNextFrame(() =>
+                {
+                    var pop = Pop();
+                    pop.Hide();
 
-            var peek = Peek();
-            peek.Show();
+                    var peek = Peek();
+                    peek.Show();
+                }));
+            }
+            else
+            {
+                var pop = Pop();
+                pop.Hide();
+
+                var peek = Peek();
+                peek.Show();
+            }                
+        }
+
+        IEnumerator HandleActionNextFrame(Action action)
+        {
+            yield return null;
+            action?.Invoke();
         }
 
         Menu Peek() 

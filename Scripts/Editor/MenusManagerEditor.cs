@@ -39,6 +39,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             var nonRepeatedNavProp = serializedObject.FindProperty("nonRepeatedNav");
             root.Add(new PropertyField(nonRepeatedNavProp, "Do not repeat menus in stack"));
 
+            var handleOpNextFrame = serializedObject.FindProperty("handleOperationsNextFrame");
+            root.Add(new PropertyField(handleOpNextFrame, "Wait a Frame Open/Close menus"));
+
             var menusProp = serializedObject.FindProperty("menus");
             var menusField = new PropertyField(menusProp);
 

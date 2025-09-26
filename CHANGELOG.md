@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing in progress
 
 ### Added
-- Nothing
+- Option to skip a frame on open/close menus operations
 
 ### Changed
 - Nothing
@@ -21,7 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing
 
 ### Fixed
-- Missing dependent compilation
+- Nothing
+
+## [1.4.0] - 2025-09-26
+
+### Added
+- Option to skip a frame on open/close menus operations
 
 ## [1.3.4] - 2025-09-20
 
