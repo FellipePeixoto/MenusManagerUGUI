@@ -14,8 +14,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         public override VisualElement CreateInspectorGUI()
         {
-            root = Resources.Load<VisualTreeAsset>("XML/MenusManagerEditor").CloneTree();
+            root = new VisualElement();
 
+            #region DEFAULT MENU SETTINGS
             SerializedProperty defaultMenuProp = serializedObject.FindProperty("defaultMenu");
             var defaultMenuField = new PropertyField(defaultMenuProp);
 
@@ -35,13 +36,18 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
             root.Add(firstSibField);
             root.Add(defaultMenuField);
+            #endregion
 
+            #region STACK SETTINGS
             var nonRepeatedNavProp = serializedObject.FindProperty("nonRepeatedNav");
             root.Add(new PropertyField(nonRepeatedNavProp, "Do not repeat menus in stack"));
+            #endregion
 
+            #region UTILS
             var handleOpNextFrame = serializedObject.FindProperty("handleOperationsNextFrame");
             root.Add(new PropertyField(handleOpNextFrame, "Wait a Frame Open/Close menus"));
 
+            #region GET MENU UTILS
             var menusProp = serializedObject.FindProperty("menus");
             var menusField = new PropertyField(menusProp);
 
@@ -61,6 +67,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             root.Add(getMenusInChildrenField);
 
             root.Add(menusField);
+            #endregion
+            #endregion
 
             return root;
         }
