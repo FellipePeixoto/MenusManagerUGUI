@@ -9,6 +9,7 @@ using UnityEngine.Events;
 namespace DevPeixoto.UI.MenuManager.UGUI
 {
     [AddComponentMenu("DevPeixoto/UI/Menu Manager/MenusManager")]
+    [ExecuteInEditMode]
     public class MenusManager : MonoBehaviour
     {
         [SerializeField] bool firstSiblingIsTheDefault;
@@ -27,6 +28,14 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         private void Awake()
         {
+#if UNITY_EDITOR
+            InEditorSetup();
+#endif
+            Init(); 
+        }
+
+        void Init()
+        {
             var bgMenusParent = new GameObject("BackgroundParent");
             backgroundMenusParent = bgMenusParent.GetComponent<Transform>();
             backgroundMenusParent.SetParent(transform);
@@ -43,7 +52,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 currentMenuList.Add(defaultMenu);
             }
             else if (firstSiblingIsTheDefault && menus.Count > 0)
-            { 
+            {
                 defaultMenu = menus[0];
                 currentMenuList.Add(defaultMenu);
                 defaultMenu.Show();
@@ -54,7 +63,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                 if (menu == null)
                     continue;
 
-                menu.owner = this;
+                menu.Owner = this;
                 menu.backgroundParent = backgroundMenusParent;
                 menu.gameObject.SetActive(true);
                 if (menu == defaultMenu)
@@ -252,7 +261,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         void SetupChildMenus()
         {
-            menus.Where(m => m != null).ToList().ForEach(m => m.owner = this);
+            menus = GetComponentsInChildren<Menu>(true).ToList();
+            menus.Where(m => m != null).ToList().ForEach(m => m.Owner = this);
         }
 
         void SetupMenuNamesList()
@@ -261,23 +271,7 @@ namespace DevPeixoto.UI.MenuManager.UGUI
             menusNames.Sort();
         }
 
-        [InitializeOnLoadMethod]
-        static void OnUnityReload()
-        {
-            var allMenus = FindObjectsByType<MenusManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var item in allMenus)
-            {
-                EditorApplication.delayCall += item.InEditorSetup;
-                EditorApplication.hierarchyChanged += item.InEditorSetup;
-            }
-        }
-
-        private void OnValidate()
-        {
-            InEditorSetup();
-        }
-
-        private void Reset()
+        private void Update()
         {
             InEditorSetup();
         }

@@ -66,6 +66,15 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         internal Transform backgroundParent;
         Coroutine fadeCoroutine;
 
+        internal MenusManager Owner 
+        { 
+            set 
+            {
+                owner = value;
+                InEditorSetup();
+            } 
+        }
+
 #if UNITY_EDITOR
         RuntimeAnimatorController lastController;
 #endif
@@ -295,19 +304,8 @@ namespace DevPeixoto.UI.MenuManager.UGUI
         }
 
 #if UNITY_EDITOR
-        private void DelayCall()
+        void InEditorSetup()
         {
-            if (this == null)
-                return;
-
-            SetupNavButtons();
-        }
-
-        void HierarchyChanged()
-        {
-            if (this == null)
-                return;
-
             SetupNavButtons();
         }
 
@@ -329,27 +327,6 @@ namespace DevPeixoto.UI.MenuManager.UGUI
                     DestroyImmediate(Animator);
                 }
             }
-        }
-
-        [InitializeOnLoadMethod]
-        static void OnUnityReload()
-        {
-            var allMenus = FindObjectsByType<Menu>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-            foreach (var item in allMenus)
-            {
-                EditorApplication.delayCall += item.DelayCall;
-                EditorApplication.hierarchyChanged += item.HierarchyChanged;
-            }
-        }
-
-        private void OnValidate()
-        {
-            SetupNavButtons();
-        }
-
-        private void Reset()
-        {
-            SetupNavButtons();
         }
 #endif
     }
