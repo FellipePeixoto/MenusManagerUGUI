@@ -9,19 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Nothing in progress
 
 ### Added
-- Option to skip a frame on open/close menus operations
+- Nothing
 
 ### Changed
-- Nothing
+- Simplify in editor tool display
 
 ### Deprecated
 - Nothing
 
 ### Removed
-- Nothing
+- Removed unused XML files
 
 ### Fixed
-- Nothing
+- Organize Menus Manager editor script
+- Update Only Call setup when not in playmode
+
+## [1.4.1] - 2025-10-29
+
+### Changed
+- Simplify in editor tool display
+
+### Removed
+- Removed unused XML files
+
+### Fixed
+- Organize Menus Manager editor script
+- Update Only Call setup when not in playmode
 
 ## [1.4.0] - 2025-09-26
 
