@@ -273,6 +273,9 @@ namespace DevPeixoto.UI.MenuManager.UGUI
 
         private void Update()
         {
+            if (Application.isPlaying) 
+                return;
+
             InEditorSetup();
         }
 #endif
